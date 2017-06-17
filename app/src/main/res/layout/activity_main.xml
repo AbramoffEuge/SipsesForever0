@@ -9,17 +9,19 @@
 
     <TextView
         android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/button1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="7dp"
-        android:layout_marginTop="7dp"
         android:text="Bricks Breaker"
         android:textAllCaps="true"
         android:textColor="?android:attr/colorActivatedHighlight"
         android:textSize="32sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+
+        android:layout_above="@+id/button1"
+        android:layout_marginBottom="7dp"
+        android:layout_marginTop="7dp"
+        />
     <View
         android:id="@+id/line1"
         android:layout_width="match_parent"
@@ -27,6 +29,9 @@
         android:background="?android:attr/colorActivatedHighlight"
         android:layout_alignRight="@+id/textView1"
         android:layout_alignLeft="@+id/textView1"
+        android:layout_alignStart="@+id/textView1"
+        android:layout_alignEnd="@id/textView1"
+
         android:layout_below="@+id/textView1" />
 
     <View
@@ -35,24 +40,45 @@
         android:layout_height="10dp"
         android:background="?android:attr/colorActivatedHighlight"
         android:layout_alignRight="@+id/textView1"
+        android:layout_alignStart="@+id/textView1"
+        android:layout_alignEnd="@id/textView1"
         android:layout_alignLeft="@+id/textView1"
+
         android:layout_above="@+id/textView1"/>
+
+    <Button
+        android:id="@+id/button2"
+        android:text="Settings"
+        android:textColor="#ffffffff"
+        android:onClick="onMyButtonClick2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#50485bb9"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_alignLeft="@id/textView1"
+        android:layout_alignRight="@id/textView1"
+        android:layout_alignEnd="@id/textView1"
+        android:layout_alignStart="@id/textView1"
+
+        android:layout_marginTop="14dp"
+        android:layout_marginBottom="14dp"/>
 
     <Button
         android:id="@+id/button1"
         android:text="New game"
+        android:textColor="#ffffffff"
         android:onClick="onMyButtonClick"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#50485bb9"
-        android:textColor="#ffffffff"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
-        android:layout_alignLeft="@id/textView1"
-        android:layout_alignRight="@id/textView1"
-        android:layout_alignEnd="@id/textView1"
-        android:layout_alignStart="@id/textView1"/>
+        android:layout_alignLeft="@+id/button2"
+        android:layout_alignStart="@+id/button2"
+        android:layout_alignRight="@+id/button2"
+        android:layout_alignEnd="@+id/button2"
+
+        android:layout_above="@+id/button2"
+        android:layout_marginTop="80dp" />
 
     <Button
         android:id="@+id/button0"
@@ -62,13 +88,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#50485bb9"
-        android:layout_alignTop="@+id/button1"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="65dp"
-        android:layout_alignEnd="@id/button1"
-        android:layout_alignStart="@id/button1"
-        android:layout_alignLeft="@id/button1"
-        android:layout_alignRight="@id/button1"/>
+        android:layout_alignEnd="@id/button2"
+        android:layout_alignStart="@id/button2"
+        android:layout_alignLeft="@id/button2"
+        android:layout_alignRight="@id/button2"
+
+        android:layout_below="@id/button2" />
 
 </RelativeLayout>
 
