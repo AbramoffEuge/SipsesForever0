@@ -14,7 +14,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="7dp"
         android:layout_marginTop="7dp"
-        android:text="Bricks Breaker"
+        android:text="@string/app_name"
         android:textAllCaps="true"
 
         android:textColor="?android:attr/colorActivatedHighlight"
@@ -60,7 +60,7 @@
         android:background="#50485bb9"
         android:onClick="onMyButtonClick2"
 
-        android:text="Settings"
+        android:text="@string/btn_settings"
         android:textColor="#ffffffff" />
 
     <Button
@@ -76,7 +76,7 @@
         android:background="#50485bb9"
         android:onClick="onMyButtonClick"
 
-        android:text="New game"
+        android:text="@string/btn_new_game"
         android:textColor="#ffffffff" />
 
     <Button
@@ -91,7 +91,7 @@
         android:layout_centerHorizontal="true"
         android:background="#50485bb9"
         android:onClick="onMyButtonClick0"
-        android:text="Exit"
+        android:text="@string/btn_exit"
 
         android:textColor="#ffffffff" />
 
