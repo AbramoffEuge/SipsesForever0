@@ -22,9 +22,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public void onMyButtonClick2(View v) {
+        Intent intent = new Intent(MainActivity.this, Main3Activity.class);
+        startActivity(intent);
+    }
+
     public void onMyButtonClick0(View v) {
         moveTaskToBack(true);
-        finish();
+        //finish();
+        //this.finish();
+        android.os.Process.killProcess(android.os.Process.myPid());
         System.exit(0);
     }
 }
