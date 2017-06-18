@@ -55,8 +55,8 @@
         android:layout_alignStart="@id/textView1"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_marginBottom="13dp"
-        android:layout_marginTop="13dp"
+        android:layout_marginBottom="14dp"
+        android:layout_marginTop="14dp"
         android:background="#50485bb9"
         android:onClick="onMyButtonClick2"
 
