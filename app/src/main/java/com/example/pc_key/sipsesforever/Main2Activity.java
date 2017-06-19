@@ -12,6 +12,7 @@ public class Main2Activity extends AppCompatActivity {
         setRequestedOrientation (ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         //requestWindowFeature(Window.FEATURE_NO_TITLE);
         getSupportActionBar().hide();
-        setContentView(R.layout.activity_main2);
+        //setContentView(R.layout.activity_main2);
+        setContentView(new MySurface(this));
     }
 }
