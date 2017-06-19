@@ -20,11 +20,9 @@ public class MyThread extends Thread {
     private volatile boolean running = false;
     private static float deltaT = 0;
     private int w, h;
-    //private RectF dstBoard = new RectF();
-    //private Bitmap board;
     public float x, y;
-    private Bitmap backGr;
-    private RectF dstBackGr;
+    private Bitmap backGr, board;
+    private RectF dstBackGr, dstBoard;
 
     public static float getDeltaT() {
         return deltaT;
@@ -33,13 +31,20 @@ public class MyThread extends Thread {
     public static void setDeltaT(float deltaT) {
         MyThread.deltaT = deltaT;
     }
+
     public MyThread(Context context, SurfaceHolder surfaceHolder, int w, int h){
         this.context = context;
         this.w = w;
         this.h = h;
         this.surfaceHolder = surfaceHolder;
+
         backGr = BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_backgr);
         dstBackGr = new RectF(0, 0, w, h);
+        board = BitmapFactory.decodeResource(context.getResources(), R.mipmap.board);
+        x = w / 2;
+        y = h - 50 - board.getHeight() / 2;
+        dstBoard = new RectF(x - board.getWidth() / 2, y - board.getHeight() / 2,
+                x + board.getWidth() / 2, y + board.getHeight() / 2);
     }
 
     public void setRunning(boolean running) {
@@ -52,13 +57,15 @@ public class MyThread extends Thread {
         double lastTime = System.currentTimeMillis() / 1000.0;
         double currentTime;
         paint.setColor(Color.CYAN);
-
         while (running){
             canvas = surfaceHolder.lockCanvas();
             if (canvas != null)
                 try {
                     synchronized(surfaceHolder){
                         canvas.drawBitmap(backGr, null, dstBackGr, paint);
+                        dstBoard.set(x - board.getWidth() / 2, y - board.getHeight() / 2,
+                                x + board.getWidth() / 2, y + board.getHeight() / 2);
+                        canvas.drawBitmap(board, null, dstBoard, paint);
                         currentTime = System.currentTimeMillis() / 1000.0;
                         deltaT += (float) (currentTime - lastTime);
                         lastTime = currentTime;
@@ -74,13 +81,13 @@ public class MyThread extends Thread {
         }
     }
 
-    /*void checkTouchDown(float xx, float yy){
-        if ((yy > h - board.getHeight() - 75)
+    void checkTouchDown(float xx, float yy){
+        if ((yy > h - board.getHeight() - 150)
                 & (xx < dstBoard.centerX() + board.getWidth()/ 2 + 50)
-                & (xx > dstBoard.centerX() - board.getWidth()/ 2 - 50)) {
-            x = xx;
-        }
-    }*/
+                & (xx > dstBoard.centerX() - board.getWidth()/ 2 - 50))
+            if ((xx < w - board.getWidth() / 2) & (xx > board.getWidth() / 2))
+                x = xx;
+    }
 
     private void updateAll(){
 
