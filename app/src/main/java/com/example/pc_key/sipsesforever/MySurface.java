@@ -51,7 +51,7 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         boolean retry = true;
-        myThread.setRunning(true);
+        myThread.setRunning(false);
         while (retry){
             try {
                 myThread.join();
