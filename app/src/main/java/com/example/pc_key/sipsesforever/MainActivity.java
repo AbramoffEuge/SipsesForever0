@@ -16,6 +16,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
     }
+    
 
     public void onMyButtonClick(View v) {
         Intent intent = new Intent(MainActivity.this, Main2Activity.class);
