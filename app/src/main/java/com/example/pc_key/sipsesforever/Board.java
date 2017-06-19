@@ -15,6 +15,10 @@ public class Board {
     Bitmap board;
     RectF dstBoard = new RectF();
 
+    public RectF getDstBoard() {
+        return dstBoard;
+    }
+
     public Board(float x, float y, Bitmap board) {
         this.x = x;
         this.y = y;

@@ -15,6 +15,7 @@ public class Block{
     float x, y;
     Bitmap block;
     RectF dstBlock = new RectF();
+    int st = 0;
 
     public Block(float x, float y, Bitmap block) {
         this.x = x;
