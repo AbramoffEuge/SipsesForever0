@@ -14,6 +14,10 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
 
     private MyThread myThread;
 
+    public MyThread getMyThread() {
+        return myThread;
+    }
+
     public MySurface(Context context) {
         super(context);
         getHolder().addCallback(this);
@@ -24,17 +28,19 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
         getHolder().addCallback(this);
     }
 
-    @Override
+    /*@Override
     public boolean onTouchEvent(MotionEvent event) {
         return super.onTouchEvent(event);
     }
+    */
 
-    /*@Override
+
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_MOVE)
             myThread.checkTouchDown(event.getX(), event.getY());
         return true;
-    }*/
+    }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
@@ -47,6 +53,8 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
         myThread.setRunning(true);
         myThread.start();
     }
+
+
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
