@@ -29,6 +29,13 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
         return super.onTouchEvent(event);
     }
 
+    /*@Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_MOVE)
+            myThread.checkTouchDown(event.getX(), event.getY());
+        return true;
+    }*/
+
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 
