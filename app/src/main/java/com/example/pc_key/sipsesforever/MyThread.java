@@ -163,6 +163,7 @@ public class MyThread extends Thread {
                                 ball.vy = -ball.vy;
                                 ball.y = b.y + btmBlock.getHeight()/2 + btmBall.getHeight()/2;
                                 b.setHealth(b.health-1);
+
                                 if (b.getHealth()<1){
                                     it.remove();}
                                 break;
