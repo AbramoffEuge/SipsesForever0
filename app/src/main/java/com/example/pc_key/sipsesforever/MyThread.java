@@ -27,11 +27,12 @@ public class MyThread extends Thread {
     private static float deltaT = 0;
     private int w, h; //Размеры экрана
     private float vxboard;
-    private Bitmap btmBackGr, btmBoard, btmBlock, btmBall;
+    private Bitmap btmBackGr, btmBoard, btmBall;
+    private Bitmap[] btmBlock;
     private RectF dstBackGr;
     private Board board;
     private Ball ball;
-    private List<Block> blocks = new ArrayList<Block>();
+    private List<Block> blocks = new ArrayList<>();
     private static int COLS = 5, ROWS = 4; // Строго контролировать!
     private float stepH, stepV; //Шаги между блоками
 
@@ -53,16 +54,20 @@ public class MyThread extends Thread {
         btmBackGr = BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_backgr);
         dstBackGr = new RectF(0, 0, w, h);
 
-        btmBoard = BitmapFactory.decodeResource(context.getResources(), R.mipmap.board);
+        btmBoard = BitmapFactory.decodeResource(context.getResources(), R.mipmap.board0);
         board = new Board(w / 2, h - 50 - btmBoard.getHeight() / 2, btmBoard);
 
-        btmBlock = BitmapFactory.decodeResource(context.getResources(), R.mipmap.block);
-        stepH = (w - btmBlock.getWidth()*COLS)/(COLS + 1);
-        stepV = (h / 2 - btmBlock.getHeight()*ROWS)/(ROWS + 1);
+        btmBlock = new Bitmap[]{BitmapFactory.decodeResource(context.getResources(), R.mipmap.block0),
+                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block1),
+                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block2),
+                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block3)};
+
+        stepH = (w - btmBlock[3].getWidth()*COLS)/(COLS + 1);
+        stepV = (h / 2 - btmBlock[3].getHeight()*ROWS)/(ROWS + 1);
         for (int i = 0; i < ROWS; i++){
             for (int j = 0; j < COLS; j++){
-                blocks.add(new Block(stepH*(j + 1) + btmBlock.getWidth()*j + btmBlock.getWidth()/2,
-                        stepV*(i + 1) + btmBlock.getHeight()*i + btmBlock.getHeight()/2, btmBlock));
+                blocks.add(new Block(stepH*(j + 1) + btmBlock[3].getWidth()*j + btmBlock[3].getWidth()/2,
+                        stepV*(i + 1) + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
             }
         }
 
@@ -122,32 +127,48 @@ public class MyThread extends Thread {
 
                         for (Iterator<Block> it = blocks.iterator(); it.hasNext();) {
                             Block b = it.next();
-                            if ((ball.x < b.x)&(ball.x + btmBall.getWidth()/2 > b.x - btmBlock.getWidth()/2)&
-                                    (ball.y > b.y - btmBlock.getHeight()/2)&(ball.y < b.y + btmBlock.getHeight()/2)){
+                            if ((ball.x < b.x)&(ball.x + btmBall.getWidth()/2 > b.x - btmBlock[0].getWidth()/2)&
+                                    (ball.y > b.y - btmBlock[0].getHeight()/2)&(ball.y < b.y + btmBlock[0].getHeight()/2)){
                                 ball.vx = -ball.vx;
-                                ball.x = b.x - btmBlock.getWidth()/2 - btmBall.getWidth()/2;
-                                it.remove();
+                                ball.x = b.x - btmBlock[0].getWidth()/2 - btmBall.getWidth()/2;
+                                b.firmness--;
+                                if (b.firmness == 0)
+                                    it.remove();
+                                else
+                                    b.block = btmBlock[b.firmness - 1];
                                 break;
                             }
-                            if ((ball.x > b.x)&(ball.x - btmBall.getWidth()/2 < b.x + btmBlock.getWidth()/2)&
-                                    (ball.y > b.y - btmBlock.getHeight()/2)&(ball.y < b.y + btmBlock.getHeight()/2)){
+                            if ((ball.x > b.x)&(ball.x - btmBall.getWidth()/2 < b.x + btmBlock[0].getWidth()/2)&
+                                    (ball.y > b.y - btmBlock[0].getHeight()/2)&(ball.y < b.y + btmBlock[0].getHeight()/2)){
                                 ball.vx = -ball.vx;
-                                ball.x = b.x + btmBlock.getWidth()/2 + btmBall.getWidth()/2;
-                                it.remove();
+                                ball.x = b.x + btmBlock[0].getWidth()/2 + btmBall.getWidth()/2;
+                                b.firmness--;
+                                if (b.firmness == 0)
+                                    it.remove();
+                                else
+                                    b.block = btmBlock[b.firmness - 1];
                                 break;
                             }
-                            if ((ball.y < b.y)&(ball.y + btmBall.getHeight()/2 > b.y - btmBlock.getHeight()/2)&
-                                    (ball.x > b.x - btmBlock.getWidth()/2)&(ball.x < b.x + btmBlock.getWidth()/2)){
+                            if ((ball.y < b.y)&(ball.y + btmBall.getHeight()/2 > b.y - btmBlock[0].getHeight()/2)&
+                                    (ball.x > b.x - btmBlock[0].getWidth()/2)&(ball.x < b.x + btmBlock[0].getWidth()/2)){
                                 ball.vy = -ball.vy;
-                                ball.y = b.y - btmBlock.getHeight()/2 - btmBall.getHeight()/2;
-                                it.remove();
+                                ball.y = b.y - btmBlock[0].getHeight()/2 - btmBall.getHeight()/2;
+                                b.firmness--;
+                                if (b.firmness == 0)
+                                    it.remove();
+                                else
+                                    b.block = btmBlock[b.firmness - 1];
                                 break;
                             }
-                            if ((ball.y > b.y)&(ball.y - btmBall.getHeight()/2 < b.y + btmBlock.getHeight()/2)&
-                                    (ball.x > b.x - btmBlock.getWidth()/2)&(ball.x < b.x + btmBlock.getWidth()/2)){
+                            if ((ball.y > b.y)&(ball.y - btmBall.getHeight()/2 < b.y + btmBlock[0].getHeight()/2)&
+                                    (ball.x > b.x - btmBlock[0].getWidth()/2)&(ball.x < b.x + btmBlock[0].getWidth()/2)){
                                 ball.vy = -ball.vy;
-                                ball.y = b.y + btmBlock.getHeight()/2 + btmBall.getHeight()/2;
-                                it.remove();
+                                ball.y = b.y + btmBlock[0].getHeight()/2 + btmBall.getHeight()/2;
+                                b.firmness--;
+                                if (b.firmness == 0)
+                                    it.remove();
+                                else
+                                    b.block = btmBlock[b.firmness - 1];
                                 break;
                             }
                         }
@@ -156,7 +177,8 @@ public class MyThread extends Thread {
                         if ((ball.y < board.y)&(ball.y + btmBall.getHeight()/2 > board.y - btmBoard.getHeight()/2)&
                                 (ball.x > board.x - btmBoard.getWidth()/2)&(ball.x < board.x + btmBoard.getWidth()/2)){
                             ball.vy = -ball.vy;
-                            ball.vx += vxboard * 0.4f;
+                            //ball.vx += vxboard * 0.4f;
+                            ball.vx = ball.vx * 0.7f + vxboard * 0.3f;
                             ball.y = board.y - btmBoard.getHeight()/2 - btmBall.getHeight()/2;
                         }
 
