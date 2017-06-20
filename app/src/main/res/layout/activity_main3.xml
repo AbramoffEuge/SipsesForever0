@@ -1,9 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@mipmap/my_backgr"
     tools:context="com.example.pc_key.sipsesforever.Main3Activity">
 
-</android.support.constraint.ConstraintLayout>
+
+
+    <Space
+        android:id="@+id/space1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginTop="35dp"
+        android:layout_marginBottom="35dp"/>
+
+    <Switch
+        android:id="@+id/switch1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/time_limit"
+        android:textSize="14sp"
+        android:textColor="#FFFFFFFF"
+        android:layout_above="@id/space1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="35dp"/>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/level"
+        android:textSize="14sp"
+        android:textColor="#FFFFFFFF"
+        android:layout_above="@id/switch1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="65dp"/>
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/settings"
+        android:textAllCaps="true"
+
+        android:textColor="?android:attr/colorActivatedHighlight"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_above="@+id/textView"
+        android:layout_centerHorizontal="true" />
+
+    <View
+        android:id="@+id/line1"
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_alignEnd="@id/textView2"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignRight="@+id/textView2"
+        android:layout_alignStart="@+id/textView2"
+        android:layout_below="@+id/textView2"
+
+        android:background="?android:attr/colorActivatedHighlight" />
+
+    <View
+        android:id="@+id/line2"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_above="@+id/textView2"
+        android:layout_alignEnd="@id/textView2"
+        android:layout_alignLeft="@+id/textView2"
+        android:layout_alignRight="@+id/textView2"
+        android:layout_alignStart="@+id/textView2"
+
+        android:background="?android:attr/colorActivatedHighlight" />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/space1"
+        android:text="@string/control"
+        android:textSize="14sp"
+        android:textColor="#FFFFFFFF"/>
+
+    <RadioButton
+        android:id="@+id/radioButton1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Гироскоп"
+        android:textColor="#FFFFFFFF"
+        android:textSize="14sp"
+        android:layout_toRightOf="@id/textView4"
+        android:layout_alignTop="@id/textView4" />
+
+    <RadioButton
+        android:id="@+id/radioButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="Касание"
+        android:textSize="14sp"
+        android:textColor="#FFFFFFFF"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@id/textView4"/>
+
+
+
+
+</RelativeLayout>
