@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import java.util.ArrayList;
@@ -25,11 +26,11 @@ public class MyThread extends Thread {
     private volatile boolean running = false; //Показывает, запущен ли поток
     private static float deltaT = 0;
     private int w, h; //Размеры экрана
+    private float vxboard;
     private Bitmap btmBackGr, btmBoard, btmBlock, btmBall;
     private RectF dstBackGr;
     private Board board;
     private Ball ball;
-    private float vx, vy;
     private List<Block> blocks = new ArrayList<Block>();
     private static int COLS = 5, ROWS = 4; // Строго контролировать!
     private float stepH, stepV; //Шаги между блоками
@@ -67,8 +68,8 @@ public class MyThread extends Thread {
 
         btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball);
         ball = new Ball(w / 4, 3 * h / 4, btmBall);
-        vx = w / 4;
-        vy = vx;
+        ball.vx = w / 3;
+        ball.vy = h / 4;
     }
 
     public void setRunning(boolean running) {
@@ -80,6 +81,7 @@ public class MyThread extends Thread {
         Canvas canvas = null;
         double lastTime = System.currentTimeMillis() / 1000.0;
         double currentTime;
+        float lastX = board.x;
         paint.setColor(Color.CYAN);
         while (running){
             canvas = surfaceHolder.lockCanvas();
@@ -94,24 +96,27 @@ public class MyThread extends Thread {
                         currentTime = System.currentTimeMillis() / 1000.0;
                         //deltaT += (float) (currentTime - lastTime);
                         deltaT = (float) (currentTime - lastTime);
-                        ball.x += vx * deltaT;
-                        ball.y += vy * deltaT;
+                        vxboard = (board.x - lastX)/deltaT;
+
+                        ball.x += ball.vx * deltaT;
+                        ball.y += ball.vy * deltaT;
                         ball.draw(canvas);
                         lastTime = currentTime;
+                        lastX = board.x;
                         if (ball.x + btmBall.getWidth()/2 > w) {
-                            vx = -vx;
+                            ball.vx = -ball.vx;
                             ball.x = w - btmBall.getWidth()/2;
                         }
                         if (ball.x - btmBall.getWidth()/2 < 0){
-                            vx = -vx;
+                            ball.vx = -ball.vx;
                             ball.x = btmBall.getWidth()/2;
                         }
                         if (ball.y + btmBall.getHeight()/2 > h) {
-                            vy = -vy;
+                            ball.vy = -ball.vy;
                             ball.y = h - btmBall.getHeight()/2;
                         }
                         if (ball.y - btmBall.getHeight()/2 < 0){
-                            vy = -vy;
+                            ball.vy = -ball.vy;
                             ball.y = btmBall.getHeight()/2;
                         }
 
@@ -119,33 +124,42 @@ public class MyThread extends Thread {
                             Block b = it.next();
                             if ((ball.x < b.x)&(ball.x + btmBall.getWidth()/2 > b.x - btmBlock.getWidth()/2)&
                                     (ball.y > b.y - btmBlock.getHeight()/2)&(ball.y < b.y + btmBlock.getHeight()/2)){
-                                vx = -vx;
+                                ball.vx = -ball.vx;
                                 ball.x = b.x - btmBlock.getWidth()/2 - btmBall.getWidth()/2;
                                 it.remove();
                                 break;
                             }
                             if ((ball.x > b.x)&(ball.x - btmBall.getWidth()/2 < b.x + btmBlock.getWidth()/2)&
                                     (ball.y > b.y - btmBlock.getHeight()/2)&(ball.y < b.y + btmBlock.getHeight()/2)){
-                                vx = -vx;
+                                ball.vx = -ball.vx;
                                 ball.x = b.x + btmBlock.getWidth()/2 + btmBall.getWidth()/2;
                                 it.remove();
                                 break;
                             }
                             if ((ball.y < b.y)&(ball.y + btmBall.getHeight()/2 > b.y - btmBlock.getHeight()/2)&
                                     (ball.x > b.x - btmBlock.getWidth()/2)&(ball.x < b.x + btmBlock.getWidth()/2)){
-                                vy = -vy;
+                                ball.vy = -ball.vy;
                                 ball.y = b.y - btmBlock.getHeight()/2 - btmBall.getHeight()/2;
                                 it.remove();
                                 break;
                             }
                             if ((ball.y > b.y)&(ball.y - btmBall.getHeight()/2 < b.y + btmBlock.getHeight()/2)&
                                     (ball.x > b.x - btmBlock.getWidth()/2)&(ball.x < b.x + btmBlock.getWidth()/2)){
-                                vy = -vy;
+                                ball.vy = -ball.vy;
                                 ball.y = b.y + btmBlock.getHeight()/2 + btmBall.getHeight()/2;
                                 it.remove();
                                 break;
                             }
                         }
+                        //Log.d("dt = ", Float.toString(deltaT));
+
+                        if ((ball.y < board.y)&(ball.y + btmBall.getHeight()/2 > board.y - btmBoard.getHeight()/2)&
+                                (ball.x > board.x - btmBoard.getWidth()/2)&(ball.x < board.x + btmBoard.getWidth()/2)){
+                            ball.vy = -ball.vy;
+                            ball.vx += vxboard * 0.4f;
+                            ball.y = board.y - btmBoard.getHeight()/2 - btmBall.getHeight()/2;
+                        }
+
                         updateAll();
                         drawAll(canvas);
                     }
