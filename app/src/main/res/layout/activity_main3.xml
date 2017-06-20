@@ -97,19 +97,22 @@
         android:text="Гироскоп"
         android:textColor="#FFFFFFFF"
         android:textSize="14sp"
-        android:layout_toRightOf="@id/textView4"
-        android:layout_alignTop="@id/textView4" />
+        android:layout_alignBaseline="@+id/textView4"
+        android:layout_alignBottom="@+id/textView4"
+        android:layout_alignRight="@+id/space1"
+        android:layout_alignEnd="@+id/space1" />
 
     <RadioButton
         android:id="@+id/radioButton2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
         android:text="Касание"
         android:textSize="14sp"
         android:textColor="#FFFFFFFF"
+        android:layout_alignBaseline="@+id/radioButton1"
+        android:layout_alignBottom="@+id/radioButton1"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/textView4"/>
+        android:layout_alignParentEnd="true" />
 
 
 
