@@ -1,3 +1,5 @@
+
+
 package com.example.pc_key.sipsesforever;
 
 import android.content.Context;
@@ -31,6 +33,8 @@ public class MyThread extends Thread {
     private RectF dstBackGr;
     private Board board;
     private Ball ball;
+
+    //  public static int health;
     private List<Block> blocks = new ArrayList<Block>();
     private static int COLS = 5, ROWS = 4; // Строго контролировать!
     private float stepH, stepV; //Шаги между блоками
@@ -50,6 +54,8 @@ public class MyThread extends Thread {
         this.h = h;
         this.surfaceHolder = surfaceHolder;
 
+
+
         btmBackGr = BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_backgr);
         dstBackGr = new RectF(0, 0, w, h);
 
@@ -61,8 +67,10 @@ public class MyThread extends Thread {
         stepV = (h / 2 - btmBlock.getHeight()*ROWS)/(ROWS + 1);
         for (int i = 0; i < ROWS; i++){
             for (int j = 0; j < COLS; j++){
+
                 blocks.add(new Block(stepH*(j + 1) + btmBlock.getWidth()*j + btmBlock.getWidth()/2,
                         stepV*(i + 1) + btmBlock.getHeight()*i + btmBlock.getHeight()/2, btmBlock));
+
             }
         }
 
@@ -91,6 +99,7 @@ public class MyThread extends Thread {
                         canvas.drawBitmap(btmBackGr, null, dstBackGr, paint);
                         board.draw(canvas);
                         for (Block b: blocks)
+
                             b.draw(canvas);
 
                         currentTime = System.currentTimeMillis() / 1000.0;
@@ -126,28 +135,36 @@ public class MyThread extends Thread {
                                     (ball.y > b.y - btmBlock.getHeight()/2)&(ball.y < b.y + btmBlock.getHeight()/2)){
                                 ball.vx = -ball.vx;
                                 ball.x = b.x - btmBlock.getWidth()/2 - btmBall.getWidth()/2;
-                                it.remove();
+                                b.setHealth(b.health-1);
+                                if (b.getHealth()<1){
+                                    it.remove();}
                                 break;
                             }
                             if ((ball.x > b.x)&(ball.x - btmBall.getWidth()/2 < b.x + btmBlock.getWidth()/2)&
                                     (ball.y > b.y - btmBlock.getHeight()/2)&(ball.y < b.y + btmBlock.getHeight()/2)){
                                 ball.vx = -ball.vx;
                                 ball.x = b.x + btmBlock.getWidth()/2 + btmBall.getWidth()/2;
-                                it.remove();
+                                b.setHealth(b.health-1);
+                                if (b.getHealth()<1){
+                                    it.remove();}
                                 break;
                             }
                             if ((ball.y < b.y)&(ball.y + btmBall.getHeight()/2 > b.y - btmBlock.getHeight()/2)&
                                     (ball.x > b.x - btmBlock.getWidth()/2)&(ball.x < b.x + btmBlock.getWidth()/2)){
                                 ball.vy = -ball.vy;
                                 ball.y = b.y - btmBlock.getHeight()/2 - btmBall.getHeight()/2;
-                                it.remove();
+                                b.setHealth(b.health-1);
+                                if (b.getHealth()<1){
+                                    it.remove();}
                                 break;
                             }
                             if ((ball.y > b.y)&(ball.y - btmBall.getHeight()/2 < b.y + btmBlock.getHeight()/2)&
                                     (ball.x > b.x - btmBlock.getWidth()/2)&(ball.x < b.x + btmBlock.getWidth()/2)){
                                 ball.vy = -ball.vy;
                                 ball.y = b.y + btmBlock.getHeight()/2 + btmBall.getHeight()/2;
-                                it.remove();
+                                b.setHealth(b.health-1);
+                                if (b.getHealth()<1){
+                                    it.remove();}
                                 break;
                             }
                         }
@@ -189,3 +206,9 @@ public class MyThread extends Thread {
 
 
 }
+
+
+
+
+
+
