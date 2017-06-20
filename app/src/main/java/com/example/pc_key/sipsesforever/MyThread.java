@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by PC_key on 19.06.2017.
@@ -25,6 +26,8 @@ public class MyThread extends Thread {
     private Paint paint = new Paint();
     private SurfaceHolder surfaceHolder;
     Context context;
+    private Random rnd = new Random();
+    private int score;
     private volatile boolean running = false; //Показывает, запущен ли поток
     private static float deltaT = 0;
     private int w, h; //Размеры экрана
@@ -36,10 +39,10 @@ public class MyThread extends Thread {
     private Ball ball;
     private List<Block> blocks = new ArrayList<>();
     private static int COLS = 5, ROWS = 4; // Строго контролировать!
+    int[][] field = new int[ROWS + 2][COLS + 2];
     private float stepH, stepV; //Шаги между блоками
     private SoundPool soundPool;
     private int soundBounce,soundCrack,soundEnd;
-
 
     public static float getDeltaT() {
         return deltaT;
@@ -66,23 +69,46 @@ public class MyThread extends Thread {
                 BitmapFactory.decodeResource(context.getResources(), R.mipmap.block2),
                 BitmapFactory.decodeResource(context.getResources(), R.mipmap.block3)};
 
-        stepH = (w - btmBlock[3].getWidth()*COLS)/(COLS + 1);
+        /*stepH = (w - btmBlock[3].getWidth()*COLS)/(COLS + 1);
         stepV = (h / 2 - btmBlock[3].getHeight()*ROWS)/(ROWS + 1);
         for (int i = 0; i < ROWS; i++){
             for (int j = 0; j < COLS; j++){
                 blocks.add(new Block(stepH*(j + 1) + btmBlock[3].getWidth()*j + btmBlock[3].getWidth()/2,
                         stepV*(i + 1) + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
             }
+        }*/
+        stepH = (w - COLS * btmBlock[3].getWidth())/2;
+        stepV = (h / 2 - ROWS * btmBlock[3].getHeight())/2;
+        for (int i = 0; i < ROWS; i++){
+            for (int j = 0; j < COLS; j++){
+                blocks.add(new Block(stepH + btmBlock[3].getWidth()*j + btmBlock[3].getWidth()/2,
+                        stepV + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
+            }
         }
 
-        btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball);
-        ball = new Ball(w / 4, 3 * h / 4, btmBall);
-        ball.vx = w / 3;
-        ball.vy = h / 4;
-        soundPool=new SoundPool(6, AudioManager.STREAM_MUSIC,1);
-        soundBounce=soundPool.load(context,R.raw.bounce,2);
-        soundCrack=soundPool.load(context,R.raw.crack,2);
-        soundEnd=soundPool.load(context,R.raw.end,2);
+        btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_m);
+        ball.vx = w / 2;
+        ball.vy = h / 2;
+
+        soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 1);
+        soundBounce = soundPool.load(context, R.raw.bounce, 2);
+        soundCrack = soundPool.load(context, R.raw.crack, 2);
+        soundEnd = soundPool.load(context, R.raw.end, 2);
+
+        //field = new int[ROWS + 2][COLS + 2];
+        for (int i = 1; i < ROWS + 1; i++) {
+            for (int j = 1; j < ROWS + 1; j++) {
+                field[i][j] = 4;
+            }
+        }
+        for (int j = 0; j < COLS + 2; j++){
+            field[0][j] = 0;
+            field[ROWS + 1][j] = 0;
+        }
+        for (int i = 0; i < ROWS + 2; i++){
+            field[i][0] = 0;
+            field[i][COLS + 1] = 0;
+        }
     }
 
     public void setRunning(boolean running) {
@@ -95,6 +121,7 @@ public class MyThread extends Thread {
         double lastTime = System.currentTimeMillis() / 1000.0;
         double currentTime;
         float lastX = board.x;
+        score = 0;
         paint.setColor(Color.CYAN);
         while (running){
             canvas = surfaceHolder.lockCanvas();
@@ -105,6 +132,9 @@ public class MyThread extends Thread {
                         board.draw(canvas);
                         for (Block b: blocks)
                             b.draw(canvas);
+
+
+
 
                         currentTime = System.currentTimeMillis() / 1000.0;
                         //deltaT += (float) (currentTime - lastTime);
@@ -119,24 +149,23 @@ public class MyThread extends Thread {
                         if (ball.x + btmBall.getWidth()/2 > w) {
                             ball.vx = -ball.vx;
                             ball.x = w - btmBall.getWidth()/2;
-                            soundPool.play(soundBounce,1,1,1,0,1f);
+                            soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
                         if (ball.x - btmBall.getWidth()/2 < 0){
                             ball.vx = -ball.vx;
                             ball.x = btmBall.getWidth()/2;
-                            soundPool.play(soundBounce,1,1,1,0,1f);
+                            soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
                         if (ball.y + btmBall.getHeight()/2 > h) {
                             ball.vy = -ball.vy;
                             ball.y = h - btmBall.getHeight()/2;
-                            soundPool.play(soundEnd,1,1,1,0,1f);
+                            soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
                         }
                         if (ball.y - btmBall.getHeight()/2 < 0){
                             ball.vy = -ball.vy;
                             ball.y = btmBall.getHeight()/2;
-                            soundPool.play(soundBounce,1,1,1,0,1f);
+                            soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
-
                         for (Iterator<Block> it = blocks.iterator(); it.hasNext();) {
                             Block b = it.next();
                             if ((ball.x < b.x)&(ball.x + btmBall.getWidth()/2 > b.x - btmBlock[0].getWidth()/2)&
@@ -145,12 +174,14 @@ public class MyThread extends Thread {
                                 ball.x = b.x - btmBlock[0].getWidth()/2 - btmBall.getWidth()/2;
                                 b.firmness--;
                                 if (b.firmness == 0) {
+                                    score++;
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
                                 }
-                                else
+                                else {
                                     b.block = btmBlock[b.firmness - 1];
-                                soundPool.play(soundBounce,1,1,1,0,1f);
+                                    soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
+                                }
                                 break;
                             }
                             if ((ball.x > b.x)&(ball.x - btmBall.getWidth()/2 < b.x + btmBlock[0].getWidth()/2)&
@@ -159,12 +190,14 @@ public class MyThread extends Thread {
                                 ball.x = b.x + btmBlock[0].getWidth()/2 + btmBall.getWidth()/2;
                                 b.firmness--;
                                 if (b.firmness == 0) {
+                                    score++;
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
                                 }
-                                else
+                                else {
                                     b.block = btmBlock[b.firmness - 1];
-                                soundPool.play(soundBounce,1,1,1,0,1f);
+                                    soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
+                                }
                                 break;
                             }
                             if ((ball.y < b.y)&(ball.y + btmBall.getHeight()/2 > b.y - btmBlock[0].getHeight()/2)&
@@ -173,12 +206,14 @@ public class MyThread extends Thread {
                                 ball.y = b.y - btmBlock[0].getHeight() / 2 - btmBall.getHeight() / 2;
                                 b.firmness--;
                                 if (b.firmness == 0){
+                                    score++;
                                     it.remove();
-                                soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
-                            }
-                                else
+                                    soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
+                                }
+                                else {
                                     b.block = btmBlock[b.firmness - 1];
-                                soundPool.play(soundBounce,1,1,1,0,1f);
+                                    soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
+                                }
                                 break;
                             }
                             if ((ball.y > b.y)&(ball.y - btmBall.getHeight()/2 < b.y + btmBlock[0].getHeight()/2)&
@@ -187,24 +222,26 @@ public class MyThread extends Thread {
                                 ball.y = b.y + btmBlock[0].getHeight()/2 + btmBall.getHeight()/2;
                                 b.firmness--;
                                 if (b.firmness == 0) {
+                                    score++;
                                     it.remove();
-                                    soundPool.play(soundCrack,1,1,1,0,1f);
+                                    soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
                                 }
-                                else
+                                else {
                                     b.block = btmBlock[b.firmness - 1];
-                                soundPool.play(soundBounce,1,1,1,0,1f);
+                                    soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
+                                }
                                 break;
                             }
                         }
-                        //Log.d("dt = ", Float.toString(deltaT));
 
-                        if ((ball.y < board.y)&(ball.y + btmBall.getHeight()/2 > board.y - btmBoard.getHeight()/2)&
+                        if ((ball.vy > 0)&(ball.y < board.y)&(ball.y + btmBall.getHeight()/2 > board.y - btmBoard.getHeight()/2)&
                                 (ball.x > board.x - btmBoard.getWidth()/2)&(ball.x < board.x + btmBoard.getWidth()/2)){
                             ball.vy = -ball.vy;
                             //ball.vx += vxboard * 0.4f;
-                            ball.vx = ball.vx * 0.7f + vxboard * 0.3f;
+                            //ball.vx = ball.vx * 0.7f + vxboard * 0.3f;
+                            ball.vx = -1.5f * ball.vy * (ball.x - board.x)/(btmBoard.getWidth()/2);
                             ball.y = board.y - btmBoard.getHeight()/2 - btmBall.getHeight()/2;
-                            soundPool.play(soundBounce,1,10,10,0,1f);
+                            soundPool.play(soundBounce, 1, 10, 10, 0, 1f);
                         }
 
                         updateAll();
