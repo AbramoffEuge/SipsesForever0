@@ -57,6 +57,7 @@ public class MyThread extends Thread {
 
 
 
+
         btmBackGr = BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_backgr);
         dstBackGr = new RectF(0, 0, w, h);
 
