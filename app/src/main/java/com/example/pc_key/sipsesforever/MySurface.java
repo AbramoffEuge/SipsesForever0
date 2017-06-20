@@ -32,7 +32,7 @@ public class MySurface extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event) {
         return super.onTouchEvent(event);
     }
-    */
+    *///
 
 
     @Override
