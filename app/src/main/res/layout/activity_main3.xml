@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/time_limit"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textColor="#FFFFFFFF"
         android:layout_above="@id/space1"
         android:layout_alignParentLeft="true"
@@ -35,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/level"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textColor="#FFFFFFFF"
         android:layout_above="@id/switch1"
         android:layout_alignParentLeft="true"
@@ -87,7 +87,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/space1"
         android:text="@string/control"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textColor="#FFFFFFFF"/>
 
     <RadioButton
@@ -96,10 +96,9 @@
         android:layout_height="wrap_content"
         android:text="Гироскоп"
         android:textColor="#FFFFFFFF"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:layout_toRightOf="@id/textView4"
-        android:layout_alignTop="@id/textView4"
-        />
+        android:layout_alignTop="@id/textView4" />
 
     <RadioButton
         android:id="@+id/radioButton2"
@@ -107,7 +106,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:text="Касание"
-        android:textSize="12sp"
+        android:textSize="14sp"
         android:textColor="#FFFFFFFF"
         android:layout_alignParentRight="true"
         android:layout_alignTop="@id/textView4"/>
