@@ -51,6 +51,7 @@ public class MyThread extends Thread {
     public MyThread(Context context, SurfaceHolder surfaceHolder, int w, int h){
         this.context = context;
         this.w = w;
+
         this.h = h;
         this.surfaceHolder = surfaceHolder;
 

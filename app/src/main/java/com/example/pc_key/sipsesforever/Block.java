@@ -12,6 +12,7 @@ import android.graphics.RectF;
 
 public class Block{
 
+
     Paint paint = new Paint();
     float x, y;
     Bitmap block;
