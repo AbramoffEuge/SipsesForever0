@@ -15,11 +15,13 @@ public class Block{
     float x, y;
     Bitmap block;
     RectF dstBlock = new RectF();
+    int firmness;
 
-    public Block(float x, float y, Bitmap block) {
+    public Block(float x, float y, Bitmap block, int firmness) {
         this.x = x;
         this.y = y;
         this.block = block;
+        this.firmness = firmness;
     }
 
     public void draw(Canvas canvas) {
