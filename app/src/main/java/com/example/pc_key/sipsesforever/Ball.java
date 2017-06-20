@@ -12,6 +12,7 @@ import android.graphics.RectF;
 public class Ball {
     Paint paint = new Paint();
     float x, y;
+    float vx, vy;
     Bitmap ball;
     RectF dstBall = new RectF();
 
