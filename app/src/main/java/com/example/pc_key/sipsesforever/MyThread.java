@@ -159,10 +159,10 @@ public class MyThread extends Thread {
                             ball.x = btmBall.getWidth()/2;
                             soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
-                        if (ball.y + btmBall.getHeight()/2 > h) {
+                        if (ball.y + btmBall.getHeight()/2 > board.y) {
                             ball.vy = 0;
                             ball.vx = 0;
-                            ball.y = h - btmBall.getHeight()/2;
+                            ball.y = board.y - btmBall.getHeight()/2;
                             soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
                             if(score > MainActivity.prefs.getInt("key", 0)) {
                                 editor.putInt("key", score);
