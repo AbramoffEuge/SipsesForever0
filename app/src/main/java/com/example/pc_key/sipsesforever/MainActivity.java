@@ -1,13 +1,20 @@
 package com.example.pc_key.sipsesforever;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private TextView textView1;
+    private TextView textView2;
+    public static SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -16,6 +23,23 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//скрытие верхей сторки
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
+        textView1= (TextView)findViewById(R.id.score);
+        textView2= (TextView)findViewById(R.id.record);
+        prefs = getSharedPreferences("key", Context.MODE_PRIVATE);
+        //textView1.setText("SCORE : " + prefs.getInt("score", 0));
+        textView2.setText("BEST SCORE : " + prefs.getInt("key", 0));
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (getIntent().getSerializableExtra("SCORE") != null)
+            textView1.setText("SCORE : " + getIntent().getSerializableExtra("SCORE"));
+        else
+            textView1.setText("SCORE : " + "-");
+        textView2.setText("BEST SCORE : " + prefs.getInt("key", 0));
     }
 
 

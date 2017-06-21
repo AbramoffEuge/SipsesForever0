@@ -1,6 +1,8 @@
 package com.example.pc_key.sipsesforever;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -43,6 +45,7 @@ public class MyThread extends Thread {
     private float stepH, stepV; //Шаги между блоками
     private SoundPool soundPool;
     private int soundBounce,soundCrack,soundEnd;
+    public SharedPreferences.Editor editor;
 
     public static float getDeltaT() {
         return deltaT;
@@ -88,8 +91,8 @@ public class MyThread extends Thread {
 
         btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_m);
         ball = new Ball(w / 4, 3 * h / 4, btmBall);
-        ball.vx = w / 2;
-        ball.vy = h / 2;
+        ball.vx = w / 4;
+        ball.vy = h / 4;
 
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 1);
         soundBounce = soundPool.load(context, R.raw.bounce, 2);
@@ -110,6 +113,7 @@ public class MyThread extends Thread {
             field[i][0] = 0;
             field[i][COLS + 1] = 0;
         }
+        editor = MainActivity.prefs.edit();
     }
 
     public void setRunning(boolean running) {
@@ -123,19 +127,17 @@ public class MyThread extends Thread {
         double currentTime;
         float lastX = board.x;
         score = 0;
-        paint.setColor(Color.CYAN);
+        paint.setColor(Color.YELLOW);
         while (running){
             canvas = surfaceHolder.lockCanvas();
             if (canvas != null)
                 try {
                     synchronized(surfaceHolder){
                         canvas.drawBitmap(btmBackGr, null, dstBackGr, paint);
+                        canvas.drawLine(0, board.y, w, board.y, paint);
                         board.draw(canvas);
                         for (Block b: blocks)
                             b.draw(canvas);
-
-
-
 
                         currentTime = System.currentTimeMillis() / 1000.0;
                         //deltaT += (float) (currentTime - lastTime);
@@ -158,9 +160,19 @@ public class MyThread extends Thread {
                             soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
                         if (ball.y + btmBall.getHeight()/2 > h) {
-                            ball.vy = -ball.vy;
+                            ball.vy = 0;
+                            ball.vx = 0;
                             ball.y = h - btmBall.getHeight()/2;
                             soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
+                            if(score > MainActivity.prefs.getInt("key", 0)) {
+                                editor.putInt("key", score);
+                                editor.commit();
+                            }
+                            Intent intent = new Intent(context, MainActivity.class);
+                            intent.putExtra("SCORE", score);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            context.startActivity(intent);
+
                         }
                         if (ball.y - btmBall.getHeight()/2 < 0){
                             ball.vy = -ball.vy;

@@ -16,4 +16,5 @@ public class Main2Activity extends AppCompatActivity {
         setContentView(new MySurface(this));
     }
 
+
 }
