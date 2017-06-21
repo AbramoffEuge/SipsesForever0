@@ -87,6 +87,7 @@ public class MyThread extends Thread {
         }
 
         btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_m);
+        ball = new Ball(w / 4, 3 * h / 4, btmBall);
         ball.vx = w / 2;
         ball.vy = h / 2;
 
