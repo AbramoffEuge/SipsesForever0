@@ -102,23 +102,24 @@
         android:layout_below="@+id/button0"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
-        android:text="Score: "
+        android:text="@string/score"
+        android:textAllCaps="true"
         android:textColor="?android:attr/colorActivatedHighlight"
         android:textSize="24sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/record"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/score"
-        android:layout_alignRight="@+id/score"
-        android:layout_below="@+id/score"
-        android:layout_marginTop="10dp"
-        android:text="Best score: 0"
+        android:layout_marginTop="15dp"
+        android:text="@string/best_score"
+        android:textAllCaps="true"
         android:textColor="?android:attr/colorActivatedHighlight"
         android:textSize="24sp"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:layout_below="@+id/score"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
 
