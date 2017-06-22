@@ -79,7 +79,7 @@ public class MyThread extends Thread {
         btmBackGr = BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_backgr);
         dstBackGr = new RectF(0, 0, w, h);
 
-        btmBomb = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bomb);
+        btmBomb = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bomb0);
 
         btmBoard = BitmapFactory.decodeResource(context.getResources(), R.mipmap.board0);
         board = new Board(w / 2, h - 50 - btmBoard.getHeight() / 2, btmBoard);
