@@ -22,6 +22,7 @@ public class Main2Activity extends AppCompatActivity implements SensorEventListe
         getSupportActionBar().hide();
         mySurface=new MySurface(this);
         setContentView(mySurface);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
         accSensor=sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
