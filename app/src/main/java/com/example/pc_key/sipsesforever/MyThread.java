@@ -31,7 +31,6 @@ public class MyThread extends Thread {
     private Paint paint = new Paint();
     private SurfaceHolder surfaceHolder;
     Context context;
-    private Random rnd = new Random();
     private int score;
     private float lastXX;
     private volatile boolean running = false; //Показывает, запущен ли поток
@@ -44,7 +43,7 @@ public class MyThread extends Thread {
     private Board board;
     private Ball ball;
     private List<Block> blocks = new ArrayList<>();
-    private static int COLS = 3, ROWS = 2; // Строго контролировать!
+    private static int COLS = 4, ROWS = 4; // Строго контролировать!
     int[][] field = new int[ROWS + 2][COLS + 2];
     private float stepH, stepV; //Шаги между блоками
     private SoundPool soundPool;
@@ -55,6 +54,7 @@ public class MyThread extends Thread {
     public Boolean isTimeOn, isTiltOn;
     public String time;
     private double start_time;
+    private Random random = new Random();
 
     public static float getDeltaT() {
         return deltaT;
@@ -105,12 +105,57 @@ public class MyThread extends Thread {
         }*/
         stepH = (w - COLS * btmBlock[3].getWidth()) / 2;
         stepV = (h / 2 - ROWS * btmBlock[3].getHeight()) / 2;
-        for (int i = 0; i < ROWS; i++) {
-            for (int j = 0; j < COLS; j++) {
-                blocks.add(new Block(stepH + btmBlock[3].getWidth() * j + btmBlock[3].getWidth() / 2,
-                        stepV + btmBlock[3].getHeight() * i + btmBlock[3].getHeight() / 2,
-                        btmBlock[max_firmness - 1], max_firmness));
+        for (int i = 0; i < ROWS / 2; i++) {
+            for (int j = 0; j < COLS / 2; j++) {
+                int r = random.nextInt(max_firmness + 1);
+                if (!(r == max_firmness)) {
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                }
             }
+        }
+        if (ROWS % 2 == 1){
+            for (int j = 0; j < COLS / 2; j++){
+                int r = random.nextInt(max_firmness + 1);
+                if (!(r == max_firmness)) {
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                }
+            }
+        }
+        if (COLS % 2 == 1){
+            for (int i = 0; i < ROWS / 2; i++){
+                int r = random.nextInt(max_firmness + 1);
+                if (!(r == max_firmness)) {
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2)+ btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                }
+            }
+        }
+        if ((COLS % 2 == 1)&(ROWS % 2 == 1)) {
+            int r = random.nextInt(max_firmness + 1);
+            if (!(r == max_firmness))
+                blocks.add(new Block(stepH + btmBlock[r].getWidth() * COLS / 2 + btmBlock[r].getWidth() / 2,
+                        stepV + btmBlock[r].getHeight() * ROWS / 2 + btmBlock[r].getHeight() / 2,
+                        btmBlock[r], r + 1));
         }
 
         btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_m);
@@ -126,7 +171,7 @@ public class MyThread extends Thread {
 
         for (int i = 1; i < ROWS + 1; i++) {
             for (int j = 1; j < ROWS + 1; j++) {
-                field[i][j] = 4;
+                field[i][j] = max_firmness;
             }
         }
         for (int j = 0; j < COLS + 2; j++) {
@@ -178,11 +223,57 @@ public class MyThread extends Thread {
                         if (blocks.isEmpty()) {
                             stepH = (w - COLS * btmBlock[3].getWidth()) / 2;
                             stepV = (h / 2 - ROWS * btmBlock[3].getHeight()) / 2;
-                            for (int i = 0; i < ROWS; i++) {
-                                for (int j = 0; j < COLS; j++) {
-                                    blocks.add(new Block(stepH + btmBlock[3].getWidth() * j + btmBlock[3].getWidth() / 2,
-                                            stepV + btmBlock[3].getHeight() * i + btmBlock[3].getHeight() / 2, btmBlock[3], 4));
+                            for (int i = 0; i < ROWS / 2; i++) {
+                                for (int j = 0; j < COLS / 2; j++) {
+                                    int r = random.nextInt(max_firmness + 1);
+                                    if (!(r == max_firmness)) {
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                    }
                                 }
+                            }
+                            if (ROWS % 2 == 1){
+                                for (int j = 0; j < COLS / 2; j++){
+                                    int r = random.nextInt(max_firmness + 1);
+                                    if (!(r == max_firmness)) {
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                    }
+                                }
+                            }
+                            if (COLS % 2 == 1){
+                                for (int i = 0; i < ROWS / 2; i++){
+                                    int r = random.nextInt(max_firmness + 1);
+                                    if (!(r == max_firmness)) {
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2)+ btmBlock[r].getWidth() / 2,
+                                                stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                                                btmBlock[r], r + 1));
+                                    }
+                                }
+                            }
+                            if ((COLS % 2 == 1)&(ROWS % 2 == 1)) {
+                                int r = random.nextInt(max_firmness + 1);
+                                if (!(r == max_firmness))
+                                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * COLS / 2 + btmBlock[r].getWidth() / 2,
+                                            stepV + btmBlock[r].getHeight() * ROWS / 2 + btmBlock[r].getHeight() / 2,
+                                            btmBlock[r], r + 1));
                             }
                             ball.x = w / 4;
                             ball.y = 3 * h / 4;
@@ -201,8 +292,8 @@ public class MyThread extends Thread {
                             ball.x = btmBall.getWidth() / 2;
                             soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
-                        if ((ball.y + btmBall.getHeight() / 2 > board.y)|(System.currentTimeMillis() / 1000.0
-                                - start_time >= my_time)) {
+                        if ((ball.y + btmBall.getHeight() / 2 > board.y)|((System.currentTimeMillis() / 1000.0
+                                - start_time >= my_time)&(isTimeOn))) {
                             ball.vy = 0;
                             ball.vx = 0;
                             if (ball.y + btmBall.getHeight() / 2 > board.y)
