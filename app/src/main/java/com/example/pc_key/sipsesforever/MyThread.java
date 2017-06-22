@@ -29,9 +29,11 @@ import static android.content.Context.MODE_PRIVATE;
 public class MyThread extends Thread {
 
     private Paint paint = new Paint();
+    private Paint paint_text = new Paint();
     private SurfaceHolder surfaceHolder;
     Context context;
     private int score;
+    private String text;
     private float lastXX;
     private volatile boolean running = false; //Показывает, запущен ли поток
     private static float deltaT = 0;
@@ -139,6 +141,7 @@ public class MyThread extends Thread {
         float lastX = board.x;
         score = 0;
         paint.setColor(0xFFFA6C00);
+        paint_text.setColor(0xE7C44F06);
         start_time = System.currentTimeMillis() / 1000.0;
         while (running) {
             canvas = surfaceHolder.lockCanvas();
@@ -151,9 +154,20 @@ public class MyThread extends Thread {
                         for (Block b : blocks)
                             b.draw(canvas);
 
+                        paint_text.setTextSize(75.0f);
+                        text = "SCORE : " + Integer.toString(score);
+                        canvas.drawText(text, w / 20, h / 25, paint_text);
+
                         currentTime = System.currentTimeMillis() / 1000.0;
                         deltaT = (float) (currentTime - lastTime);
                         vxboard = (board.x - lastX) / deltaT;
+
+                        if (isTimeOn) {
+                            int min = (int)((my_time - (currentTime - start_time)) / 60);
+                            int sec = (int)(my_time - (currentTime - start_time) - min * 60);
+                            text = "TIME : " + Integer.toString(min) + " : " + Integer.toString(sec);
+                            canvas.drawText(text, 6.3f * w / 11, h / 25, paint_text);
+                        }
 
                         for (Bomb bomb : flyingBombs) {
                             bomb.y += bomb.vy * deltaT;
@@ -163,6 +177,7 @@ public class MyThread extends Thread {
                         ball.x += ball.vx * deltaT;
                         ball.y += ball.vy * deltaT;
                         ball.draw(canvas);
+
                         if (blocks.isEmpty()) {
                             stepH = (w - COLS * btmBlock[3].getWidth()) / 2;
                             stepV = (h / 2 - ROWS * btmBlock[3].getHeight()) / 2;
