@@ -41,7 +41,7 @@ public class MyThread extends Thread {
     private Board board;
     private Ball ball;
     private List<Block> blocks = new ArrayList<>();
-    private static int COLS = 5, ROWS = 4; // Строго контролировать!
+    private static int COLS = 2, ROWS = 1; // Строго контролировать!
     int[][] field = new int[ROWS + 2][COLS + 2];
     private float stepH, stepV; //Шаги между блоками
     private SoundPool soundPool;
@@ -93,7 +93,7 @@ public class MyThread extends Thread {
         btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_m);
         ball = new Ball(w / 4, 3 * h / 4, btmBall);
         ball.vx = w / 4;
-        ball.vy = h / 4;
+        ball.vy = - h / 4;
         board.vx=0;
 
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 1);
@@ -149,6 +149,20 @@ public class MyThread extends Thread {
                         ball.x += ball.vx * deltaT;
                         ball.y += ball.vy * deltaT;
                         ball.draw(canvas);
+                        if (blocks.isEmpty()) {
+                            stepH = (w - COLS * btmBlock[3].getWidth())/2;
+                            stepV = (h / 2 - ROWS * btmBlock[3].getHeight())/2;
+                            for (int i = 0; i < ROWS; i++){
+                                for (int j = 0; j < COLS; j++){
+                                    blocks.add(new Block(stepH + btmBlock[3].getWidth()*j + btmBlock[3].getWidth()/2,
+                                            stepV + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
+                                }
+                            }
+                            ball.x = w / 4;
+                            ball.y = 3 * h / 4;
+                            ball.vx = w / 4;
+                            ball.vy = -h / 4;
+                        }
                         lastTime = currentTime;
                         lastX = board.x;
                         if (ball.x + btmBall.getWidth()/2 > w) {
