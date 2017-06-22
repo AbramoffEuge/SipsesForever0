@@ -280,7 +280,7 @@ public class MyThread extends Thread {
 
                 ball = new Ball(w / 4, 3 * h / 4, btmBall);
                 ball.vx = w / 4;
-                ball.vy = h / 4;
+                ball.vy =-h / 4;
 
                 for (Block b: blocks)
                     b.draw(canvas);
