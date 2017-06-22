@@ -1,5 +1,6 @@
 package com.example.pc_key.sipsesforever;
 
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,16 +15,17 @@ public class Main2Activity extends AppCompatActivity implements SensorEventListe
     private SensorManager sensorManager;
     private Sensor accSensor;
     private MySurface mySurface;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//скрытие верхей сторки
         getSupportActionBar().hide();
-        mySurface=new MySurface(this);
+        mySurface = new MySurface(this);
         setContentView(mySurface);
-        sensorManager=(SensorManager)getSystemService(SENSOR_SERVICE);
-        accSensor=sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @Override
@@ -41,7 +43,8 @@ public class Main2Activity extends AppCompatActivity implements SensorEventListe
     @Override
     public void onSensorChanged(SensorEvent event) {
         try {
-            mySurface.getMyThread().accelerometerChange(event.values[0]);
+            if (mySurface.getMyThread().isTiltOn)
+                mySurface.getMyThread().accelerometerChange(event.values[0]);
         }
         catch(Exception e){}
     }

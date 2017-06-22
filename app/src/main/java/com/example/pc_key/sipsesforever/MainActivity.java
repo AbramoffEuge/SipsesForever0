@@ -15,6 +15,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView textView1;
     private TextView textView2;
     public static SharedPreferences prefs;
+    public static SharedPreferences prefs1, prefs2, prefs3, prefs4, prefs5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,6 +28,12 @@ public class MainActivity extends AppCompatActivity {
         textView2 = (TextView)findViewById(R.id.record);
         prefs = getSharedPreferences("key", Context.MODE_PRIVATE);
         textView2.setText("BEST SCORE : " + prefs.getInt("key", 0));
+
+        prefs1 = getSharedPreferences("firmness", MODE_PRIVATE);
+        prefs2 = getSharedPreferences("speed", MODE_PRIVATE);
+        prefs3 = getSharedPreferences("time_mode", MODE_PRIVATE);
+        prefs4 = getSharedPreferences("tilt", MODE_PRIVATE);
+        prefs5 = getSharedPreferences("time", MODE_PRIVATE);
     }
 
     @Override
@@ -37,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         else
             textView1.setText("SCORE : " + "-");
         textView2.setText("BEST SCORE : " + prefs.getInt("key", 0));
+
     }
 
 

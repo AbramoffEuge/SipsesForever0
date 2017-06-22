@@ -13,11 +13,14 @@ import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.SurfaceHolder;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by PC_key on 19.06.2017.
@@ -41,12 +44,17 @@ public class MyThread extends Thread {
     private Board board;
     private Ball ball;
     private List<Block> blocks = new ArrayList<>();
-    private static int COLS = 2, ROWS = 1; // Строго контролировать!
+    private static int COLS = 3, ROWS = 2; // Строго контролировать!
     int[][] field = new int[ROWS + 2][COLS + 2];
     private float stepH, stepV; //Шаги между блоками
     private SoundPool soundPool;
     private int soundBounce,soundCrack,soundEnd;
     public SharedPreferences.Editor editor;
+    public int max_firmness, y_speed;
+    public double my_time;
+    public Boolean isTimeOn, isTiltOn;
+    public String time;
+    private double start_time;
 
     public static float getDeltaT() {
         return deltaT;
@@ -56,11 +64,25 @@ public class MyThread extends Thread {
         MyThread.deltaT = deltaT;
     }
 
-    public MyThread(Context context, SurfaceHolder surfaceHolder, int w, int h){
+    public MyThread(Context context, SurfaceHolder surfaceHolder, int w, int h) {
         this.context = context;
         this.w = w;
         this.h = h;
         this.surfaceHolder = surfaceHolder;
+
+        try {
+            max_firmness = MainActivity.prefs1.getInt("firmness", 4);
+            y_speed = MainActivity.prefs2.getInt("speed", 1);
+            isTimeOn = MainActivity.prefs3.getBoolean("time_mode", false);
+            isTiltOn = MainActivity.prefs4.getBoolean("tilt", false);
+            time = MainActivity.prefs5.getString("time", "");
+            if (isTimeOn){
+                String[] words = time.split(":");
+                my_time = Integer.parseInt(words[0])*60 +Integer.parseInt(words[1]);
+            }
+
+        } catch (Exception e) {
+        }
 
         btmBackGr = BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_backgr);
         dstBackGr = new RectF(0, 0, w, h);
@@ -81,20 +103,21 @@ public class MyThread extends Thread {
                         stepV*(i + 1) + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
             }
         }*/
-        stepH = (w - COLS * btmBlock[3].getWidth())/2;
-        stepV = (h / 2 - ROWS * btmBlock[3].getHeight())/2;
-        for (int i = 0; i < ROWS; i++){
-            for (int j = 0; j < COLS; j++){
-                blocks.add(new Block(stepH + btmBlock[3].getWidth()*j + btmBlock[3].getWidth()/2,
-                        stepV + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
+        stepH = (w - COLS * btmBlock[3].getWidth()) / 2;
+        stepV = (h / 2 - ROWS * btmBlock[3].getHeight()) / 2;
+        for (int i = 0; i < ROWS; i++) {
+            for (int j = 0; j < COLS; j++) {
+                blocks.add(new Block(stepH + btmBlock[3].getWidth() * j + btmBlock[3].getWidth() / 2,
+                        stepV + btmBlock[3].getHeight() * i + btmBlock[3].getHeight() / 2,
+                        btmBlock[max_firmness - 1], max_firmness));
             }
         }
 
         btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_m);
         ball = new Ball(w / 4, 3 * h / 4, btmBall);
         ball.vx = w / 4;
-        ball.vy = - h / 4;
-        board.vx=0;
+        ball.vy = -y_speed * h / 6;
+        board.vx = 0;
 
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 1);
         soundBounce = soundPool.load(context, R.raw.bounce, 2);
@@ -106,16 +129,18 @@ public class MyThread extends Thread {
                 field[i][j] = 4;
             }
         }
-        for (int j = 0; j < COLS + 2; j++){
+        for (int j = 0; j < COLS + 2; j++) {
             field[0][j] = 0;
             field[ROWS + 1][j] = 0;
         }
-        for (int i = 0; i < ROWS + 2; i++){
+        for (int i = 0; i < ROWS + 2; i++) {
             field[i][0] = 0;
             field[i][COLS + 1] = 0;
         }
         editor = MainActivity.prefs.edit();
         lastXX = 0;
+
+
     }
 
     public void setRunning(boolean running) {
@@ -129,58 +154,61 @@ public class MyThread extends Thread {
         double currentTime;
         float lastX = board.x;
         score = 0;
-        paint.setColor(Color.YELLOW);
-        while (running){
+        paint.setColor(0xFFFA6C00);
+        start_time = System.currentTimeMillis() / 1000.0;
+        while (running) {
             canvas = surfaceHolder.lockCanvas();
             if (canvas != null)
                 try {
-                    synchronized(surfaceHolder){
+                    synchronized (surfaceHolder) {
                         canvas.drawBitmap(btmBackGr, null, dstBackGr, paint);
                         canvas.drawLine(0, board.y, w, board.y, paint);
                         board.draw(canvas);
-                        for (Block b: blocks)
+                        for (Block b : blocks)
                             b.draw(canvas);
 
                         currentTime = System.currentTimeMillis() / 1000.0;
                         //deltaT += (float) (currentTime - lastTime);
                         deltaT = (float) (currentTime - lastTime);
-                        vxboard = (board.x - lastX)/deltaT;
+                        vxboard = (board.x - lastX) / deltaT;
 
                         ball.x += ball.vx * deltaT;
                         ball.y += ball.vy * deltaT;
                         ball.draw(canvas);
                         if (blocks.isEmpty()) {
-                            stepH = (w - COLS * btmBlock[3].getWidth())/2;
-                            stepV = (h / 2 - ROWS * btmBlock[3].getHeight())/2;
-                            for (int i = 0; i < ROWS; i++){
-                                for (int j = 0; j < COLS; j++){
-                                    blocks.add(new Block(stepH + btmBlock[3].getWidth()*j + btmBlock[3].getWidth()/2,
-                                            stepV + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
+                            stepH = (w - COLS * btmBlock[3].getWidth()) / 2;
+                            stepV = (h / 2 - ROWS * btmBlock[3].getHeight()) / 2;
+                            for (int i = 0; i < ROWS; i++) {
+                                for (int j = 0; j < COLS; j++) {
+                                    blocks.add(new Block(stepH + btmBlock[3].getWidth() * j + btmBlock[3].getWidth() / 2,
+                                            stepV + btmBlock[3].getHeight() * i + btmBlock[3].getHeight() / 2, btmBlock[3], 4));
                                 }
                             }
                             ball.x = w / 4;
                             ball.y = 3 * h / 4;
                             ball.vx = w / 4;
-                            ball.vy = -h / 4;
+                            ball.vy = -y_speed * h / 6;
                         }
                         lastTime = currentTime;
                         lastX = board.x;
-                        if (ball.x + btmBall.getWidth()/2 > w) {
+                        if (ball.x + btmBall.getWidth() / 2 > w) {
                             ball.vx = -ball.vx;
-                            ball.x = w - btmBall.getWidth()/2;
+                            ball.x = w - btmBall.getWidth() / 2;
                             soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
-                        if (ball.x - btmBall.getWidth()/2 < 0){
+                        if (ball.x - btmBall.getWidth() / 2 < 0) {
                             ball.vx = -ball.vx;
-                            ball.x = btmBall.getWidth()/2;
+                            ball.x = btmBall.getWidth() / 2;
                             soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
-                        if (ball.y + btmBall.getHeight()/2 > board.y) {
+                        if ((ball.y + btmBall.getHeight() / 2 > board.y)|(System.currentTimeMillis() / 1000.0
+                                - start_time >= my_time)) {
                             ball.vy = 0;
                             ball.vx = 0;
-                            ball.y = board.y - btmBall.getHeight()/2;
+                            if (ball.y + btmBall.getHeight() / 2 > board.y)
+                                ball.y = board.y - btmBall.getHeight() / 2;
                             soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
-                            if(score > MainActivity.prefs.getInt("key", 0)) {
+                            if (score > MainActivity.prefs.getInt("key", 0)) {
                                 editor.putInt("key", score);
                                 editor.commit();
                             }
@@ -188,73 +216,70 @@ public class MyThread extends Thread {
                             intent.putExtra("SCORE", score);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             context.startActivity(intent);
+                            break;
                         }
-                        if (ball.y - btmBall.getHeight()/2 < 0){
+                        if (ball.y - btmBall.getHeight() / 2 < 0) {
                             ball.vy = -ball.vy;
-                            ball.y = btmBall.getHeight()/2;
+                            ball.y = btmBall.getHeight() / 2;
                             soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
-                        for (Iterator<Block> it = blocks.iterator(); it.hasNext();) {
+                        for (Iterator<Block> it = blocks.iterator(); it.hasNext(); ) {
                             Block b = it.next();
-                            if ((ball.x < b.x)&(ball.x + btmBall.getWidth()/2 > b.x - btmBlock[0].getWidth()/2)&
-                                    (ball.y > b.y - btmBlock[0].getHeight()/2)&(ball.y < b.y + btmBlock[0].getHeight()/2)){
+                            if ((ball.x < b.x) & (ball.x + btmBall.getWidth() / 2 > b.x - btmBlock[0].getWidth() / 2) &
+                                    (ball.y > b.y - btmBlock[0].getHeight() / 2) & (ball.y < b.y + btmBlock[0].getHeight() / 2)) {
                                 ball.vx = -ball.vx;
-                                ball.x = b.x - btmBlock[0].getWidth()/2 - btmBall.getWidth()/2;
+                                ball.x = b.x - btmBlock[0].getWidth() / 2 - btmBall.getWidth() / 2;
                                 b.firmness--;
                                 if (b.firmness == 0) {
                                     score++;
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
-                                }
-                                else {
+                                } else {
                                     b.block = btmBlock[b.firmness - 1];
                                     soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                                 }
                                 break;
                             }
-                            if ((ball.x > b.x)&(ball.x - btmBall.getWidth()/2 < b.x + btmBlock[0].getWidth()/2)&
-                                    (ball.y > b.y - btmBlock[0].getHeight()/2)&(ball.y < b.y + btmBlock[0].getHeight()/2)){
+                            if ((ball.x > b.x) & (ball.x - btmBall.getWidth() / 2 < b.x + btmBlock[0].getWidth() / 2) &
+                                    (ball.y > b.y - btmBlock[0].getHeight() / 2) & (ball.y < b.y + btmBlock[0].getHeight() / 2)) {
                                 ball.vx = -ball.vx;
-                                ball.x = b.x + btmBlock[0].getWidth()/2 + btmBall.getWidth()/2;
+                                ball.x = b.x + btmBlock[0].getWidth() / 2 + btmBall.getWidth() / 2;
                                 b.firmness--;
                                 if (b.firmness == 0) {
                                     score++;
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
-                                }
-                                else {
+                                } else {
                                     b.block = btmBlock[b.firmness - 1];
                                     soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                                 }
                                 break;
                             }
-                            if ((ball.y < b.y)&(ball.y + btmBall.getHeight()/2 > b.y - btmBlock[0].getHeight()/2)&
-                                    (ball.x > b.x - btmBlock[0].getWidth()/2)&(ball.x < b.x + btmBlock[0].getWidth()/2)) {
+                            if ((ball.y < b.y) & (ball.y + btmBall.getHeight() / 2 > b.y - btmBlock[0].getHeight() / 2) &
+                                    (ball.x > b.x - btmBlock[0].getWidth() / 2) & (ball.x < b.x + btmBlock[0].getWidth() / 2)) {
                                 ball.vy = -ball.vy;
                                 ball.y = b.y - btmBlock[0].getHeight() / 2 - btmBall.getHeight() / 2;
                                 b.firmness--;
-                                if (b.firmness == 0){
+                                if (b.firmness == 0) {
                                     score++;
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
-                                }
-                                else {
+                                } else {
                                     b.block = btmBlock[b.firmness - 1];
                                     soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                                 }
                                 break;
                             }
-                            if ((ball.y > b.y)&(ball.y - btmBall.getHeight()/2 < b.y + btmBlock[0].getHeight()/2)&
-                                    (ball.x > b.x - btmBlock[0].getWidth()/2)&(ball.x < b.x + btmBlock[0].getWidth()/2)){
+                            if ((ball.y > b.y) & (ball.y - btmBall.getHeight() / 2 < b.y + btmBlock[0].getHeight() / 2) &
+                                    (ball.x > b.x - btmBlock[0].getWidth() / 2) & (ball.x < b.x + btmBlock[0].getWidth() / 2)) {
                                 ball.vy = -ball.vy;
-                                ball.y = b.y + btmBlock[0].getHeight()/2 + btmBall.getHeight()/2;
+                                ball.y = b.y + btmBlock[0].getHeight() / 2 + btmBall.getHeight() / 2;
                                 b.firmness--;
                                 if (b.firmness == 0) {
                                     score++;
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
-                                }
-                                else {
+                                } else {
                                     b.block = btmBlock[b.firmness - 1];
                                     soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                                 }
@@ -262,21 +287,20 @@ public class MyThread extends Thread {
                             }
                         }
 
-                        if ((ball.vy > 0)&(ball.y < board.y)&(ball.y + btmBall.getHeight()/2 > board.y - btmBoard.getHeight()/2)&
-                                (ball.x > board.x - btmBoard.getWidth()/2)&(ball.x < board.x + btmBoard.getWidth()/2)){
+                        if ((ball.vy > 0) & (ball.y < board.y) & (ball.y + btmBall.getHeight() / 2 > board.y - btmBoard.getHeight() / 2) &
+                                (ball.x > board.x - btmBoard.getWidth() / 2) & (ball.x < board.x + btmBoard.getWidth() / 2)) {
                             ball.vy = -ball.vy;
                             //ball.vx += vxboard * 0.4f;
                             //ball.vx = ball.vx * 0.7f + vxboard * 0.3f;
-                            ball.vx = -1.5f * ball.vy * (ball.x - board.x)/(btmBoard.getWidth()/2);
-                            ball.y = board.y - btmBoard.getHeight()/2 - btmBall.getHeight()/2;
+                            ball.vx = -1.5f * ball.vy * (ball.x - board.x) / (btmBoard.getWidth() / 2);
+                            ball.y = board.y - btmBoard.getHeight() / 2 - btmBall.getHeight() / 2;
                             soundPool.play(soundBounce, 1, 10, 10, 0, 1f);
                         }
 
                         drawAll(canvas);
                         updateAll();
                     }
-                }
-                finally {
+                } finally {
                     if (canvas != null)
                         surfaceHolder.unlockCanvasAndPost(canvas);
                 }
@@ -290,33 +314,32 @@ public class MyThread extends Thread {
                 board.x = xx;
     }
 
-    public void accelerometerChange(float xx){
-        if (board.x - btmBoard.getWidth()/2 >= 0 & board.x + btmBoard.getWidth()/2 <= w) {
-            if (xx * lastXX > 0 )
-                board.vx -= 0.3f * xx;
+    public void accelerometerChange(float xx) {
+        if (board.x - btmBoard.getWidth() / 2 >= 0 & board.x + btmBoard.getWidth() / 2 <= w) {
+            if (xx * lastXX > 0)
+                board.vx -= 0.4f * xx;
             else
                 board.vx = 0;
             board.x += board.vx;
-            if (board.x - btmBoard.getWidth()/2 < 0) {
+            if (board.x - btmBoard.getWidth() / 2 < 0) {
                 board.x = btmBoard.getWidth() / 2;
                 board.vx = 0;
             }
-            if (board.x + btmBoard.getWidth()/2 > w) {
+            if (board.x + btmBoard.getWidth() / 2 > w) {
                 board.x = w - btmBoard.getWidth() / 2;
                 board.vx = 0;
             }
             lastXX = xx;
         }
-     }
+    }
 
-    private void updateAll(){
+    private void updateAll() {
 
     }
 
-    private void drawAll(Canvas canvas){
+    private void drawAll(Canvas canvas) {
 
     }
-
 
 
 }
