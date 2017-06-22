@@ -30,6 +30,7 @@ public class MyThread extends Thread {
     Context context;
     private Random rnd = new Random();
     private int score;
+    private float lastXX;
     private volatile boolean running = false; //Показывает, запущен ли поток
     private static float deltaT = 0;
     private int w, h; //Размеры экрана
@@ -93,6 +94,7 @@ public class MyThread extends Thread {
         ball = new Ball(w / 4, 3 * h / 4, btmBall);
         ball.vx = w / 4;
         ball.vy = h / 4;
+        board.vx=0;
 
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 1);
         soundBounce = soundPool.load(context, R.raw.bounce, 2);
@@ -113,6 +115,7 @@ public class MyThread extends Thread {
             field[i][COLS + 1] = 0;
         }
         editor = MainActivity.prefs.edit();
+        lastXX = 0;
     }
 
     public void setRunning(boolean running) {
@@ -272,6 +275,25 @@ public class MyThread extends Thread {
             if ((xx < w - btmBoard.getWidth() / 2) & (xx > btmBoard.getWidth() / 2))
                 board.x = xx;
     }
+
+    public void accelerometerChange(float xx){
+        if (board.x - btmBoard.getWidth()/2 >= 0 & board.x + btmBoard.getWidth()/2 <= w) {
+            if (xx * lastXX > 0 )
+                board.vx -= 0.3f * xx;
+            else
+                board.vx = 0;
+            board.x += board.vx;
+            if (board.x - btmBoard.getWidth()/2 < 0) {
+                board.x = btmBoard.getWidth() / 2;
+                board.vx = 0;
+            }
+            if (board.x + btmBoard.getWidth()/2 > w) {
+                board.x = w - btmBoard.getWidth() / 2;
+                board.vx = 0;
+            }
+            lastXX = xx;
+        }
+     }
 
     private void updateAll(){
 
