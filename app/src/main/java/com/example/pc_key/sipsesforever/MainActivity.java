@@ -23,13 +23,10 @@ public class MainActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);//скрытие верхей сторки
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main);
-        textView1= (TextView)findViewById(R.id.score);
-        textView2= (TextView)findViewById(R.id.record);
+        textView1 = (TextView)findViewById(R.id.score);
+        textView2 = (TextView)findViewById(R.id.record);
         prefs = getSharedPreferences("key", Context.MODE_PRIVATE);
-        //textView1.setText("SCORE : " + prefs.getInt("score", 0));
         textView2.setText("BEST SCORE : " + prefs.getInt("key", 0));
-
-
     }
 
     @Override

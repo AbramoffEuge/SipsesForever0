@@ -21,5 +21,6 @@
     <string name="tilt_control">Sensitivity to tilt</string>
     <string name="score">Score :</string>
     <string name="best_score">Best Score : 0</string>
+    <string name="btn_save_and_exit">Save &amp; Exit</string>
 </resources>
 

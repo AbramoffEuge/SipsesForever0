@@ -99,7 +99,6 @@ public class MyThread extends Thread {
         soundCrack = soundPool.load(context, R.raw.crack, 2);
         soundEnd = soundPool.load(context, R.raw.end, 2);
 
-        //field = new int[ROWS + 2][COLS + 2];
         for (int i = 1; i < ROWS + 1; i++) {
             for (int j = 1; j < ROWS + 1; j++) {
                 field[i][j] = 4;
@@ -122,7 +121,7 @@ public class MyThread extends Thread {
 
     @Override
     public void run() {
-        Canvas canvas = null;
+        Canvas canvas;
         double lastTime = System.currentTimeMillis() / 1000.0;
         double currentTime;
         float lastX = board.x;
@@ -172,7 +171,6 @@ public class MyThread extends Thread {
                             intent.putExtra("SCORE", score);
                             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             context.startActivity(intent);
-
                         }
                         if (ball.y - btmBall.getHeight()/2 < 0){
                             ball.vy = -ball.vy;
@@ -257,8 +255,8 @@ public class MyThread extends Thread {
                             soundPool.play(soundBounce, 1, 10, 10, 0, 1f);
                         }
 
-                        updateAll();
                         drawAll(canvas);
+                        updateAll();
                     }
                 }
                 finally {
