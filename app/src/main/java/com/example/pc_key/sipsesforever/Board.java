@@ -11,7 +11,7 @@ import android.graphics.RectF;
 
 public class Board {
     Paint paint = new Paint();
-    float x, y, vx;
+    float x, y;
     Bitmap board;
     RectF dstBoard = new RectF();
 

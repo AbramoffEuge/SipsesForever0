@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
         prefs = getSharedPreferences("key", Context.MODE_PRIVATE);
         textView2.setText("BEST SCORE : " + prefs.getInt("key", 0));
     }
+    
 
     @Override
     protected void onResume() {
