@@ -16,12 +16,14 @@ public class Block{
     Bitmap block;
     RectF dstBlock = new RectF();
     int firmness;
+    boolean hasBomb;
 
     public Block(float x, float y, Bitmap block, int firmness) {
         this.x = x;
         this.y = y;
         this.block = block;
         this.firmness = firmness;
+        hasBomb=false;
     }
 
     public void draw(Canvas canvas) {

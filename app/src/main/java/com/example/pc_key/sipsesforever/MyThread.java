@@ -37,16 +37,17 @@ public class MyThread extends Thread {
     private static float deltaT = 0;
     private int w, h; //Размеры экрана
     private float vxboard;
-    private Bitmap btmBackGr, btmBoard, btmBall;
+    private Bitmap btmBackGr, btmBoard, btmBall, btmBomb;
     private Bitmap[] btmBlock;
     private RectF dstBackGr;
     private Board board;
     private Ball ball;
     private List<Block> blocks = new ArrayList<>();
+    private List<Bomb> flyingBombs = new ArrayList<>();
     private static int COLS = 9, ROWS = 5; // Строго контролировать!
     private int stepH, stepV; //Шаги между блоками
     private SoundPool soundPool;
-    private int soundBounce,soundCrack,soundEnd;
+    private int soundBounce, soundCrack, soundEnd;
     public SharedPreferences.Editor editor;
     public int max_firmness, y_speed;
     public double my_time;
@@ -67,9 +68,9 @@ public class MyThread extends Thread {
             isTimeOn = MainActivity.prefs3.getBoolean("time_mode", false);
             isTiltOn = MainActivity.prefs4.getBoolean("tilt", false);
             time = MainActivity.prefs5.getString("time", "");
-            if (isTimeOn){
+            if (isTimeOn) {
                 String[] words = time.split(":");
-                my_time = Integer.parseInt(words[0])*60 +Integer.parseInt(words[1]);
+                my_time = Integer.parseInt(words[0]) * 60 + Integer.parseInt(words[1]);
             }
 
         } catch (Exception e) {
@@ -77,6 +78,8 @@ public class MyThread extends Thread {
 
         btmBackGr = BitmapFactory.decodeResource(context.getResources(), R.mipmap.my_backgr);
         dstBackGr = new RectF(0, 0, w, h);
+
+        btmBomb = BitmapFactory.decodeResource(context.getResources(), R.mipmap.bomb);
 
         btmBoard = BitmapFactory.decodeResource(context.getResources(), R.mipmap.board0);
         board = new Board(w / 2, h - 50 - btmBoard.getHeight() / 2, btmBoard);
@@ -90,11 +93,11 @@ public class MyThread extends Thread {
         ball = new Ball(w / 4, 3 * h / 4, btmBall);
         ball.vx = w / 4;
         if (y_speed == 1)
-            ball.vy = - 2 * 1.3f * h / 9;
+            ball.vy = -2 * 1.3f * h / 9;
         if (y_speed == 3)
-            ball.vy = - 2.7f * 1.3f * h / 9;
+            ball.vy = -2.7f * 1.3f * h / 9;
         if (y_speed == 2)
-            ball.vy = - 2.5f * 1.3f * h / 9;
+            ball.vy = -2.5f * 1.3f * h / 9;
         board.vx = 0;
 
         /*stepH = (w - btmBlock[3].getWidth()*COLS)/(COLS + 1);
@@ -110,61 +113,10 @@ public class MyThread extends Thread {
         COLS = (w - 2 * stepH) / btmBlock[0].getWidth();
         stepH = (w - COLS * btmBlock[0].getWidth()) / 2;
         stepV = h / 10;
-        ROWS = (h / 2 - stepV)/ btmBlock[0].getHeight();
+        ROWS = (h / 2 - stepV) / btmBlock[0].getHeight();
         stepV = (h / 2 - ROWS * btmBlock[0].getHeight()) / 2;
 
-        for (int i = 0; i < ROWS / 2; i++) {
-            for (int j = 0; j < COLS / 2; j++) {
-                int r = random.nextInt(max_firmness + 1);
-                if (!(r == max_firmness)) {
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                }
-            }
-        }
-        if (ROWS % 2 == 1){
-            for (int j = 0; j < COLS / 2; j++){
-                int r = random.nextInt(max_firmness + 1);
-                if (!(r == max_firmness)) {
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                }
-            }
-        }
-        if (COLS % 2 == 1){
-            for (int i = 0; i < ROWS / 2; i++){
-                int r = random.nextInt(max_firmness + 1);
-                if (!(r == max_firmness)) {
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2)+ btmBlock[r].getWidth() / 2,
-                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
-                            btmBlock[r], r + 1));
-                }
-            }
-        }
-        if ((COLS % 2 == 1)&(ROWS % 2 == 1)) {
-            int r = random.nextInt(max_firmness + 1);
-            if (!(r == max_firmness))
-                blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
-                        stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
-                        btmBlock[r], r + 1));
-        }
+        blockGen();
 
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 1);
         soundBounce = soundPool.load(context, R.raw.bounce, 2);
@@ -203,76 +155,61 @@ public class MyThread extends Thread {
                         deltaT = (float) (currentTime - lastTime);
                         vxboard = (board.x - lastX) / deltaT;
 
+                        for (Bomb bomb : flyingBombs) {
+                            bomb.y += bomb.vy * deltaT;
+                            bomb.draw(canvas);
+                        }
+
                         ball.x += ball.vx * deltaT;
                         ball.y += ball.vy * deltaT;
                         ball.draw(canvas);
                         if (blocks.isEmpty()) {
                             stepH = (w - COLS * btmBlock[3].getWidth()) / 2;
                             stepV = (h / 2 - ROWS * btmBlock[3].getHeight()) / 2;
-                            for (int i = 0; i < ROWS / 2; i++) {
-                                for (int j = 0; j < COLS / 2; j++) {
-                                    int r = random.nextInt(max_firmness + 1);
-                                    if (!(r == max_firmness)) {
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                    }
-                                }
-                            }
-                            if (ROWS % 2 == 1){
-                                for (int j = 0; j < COLS / 2; j++){
-                                    int r = random.nextInt(max_firmness + 1);
-                                    if (!(r == max_firmness)) {
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                    }
-                                }
-                            }
-                            if (COLS % 2 == 1){
-                                for (int i = 0; i < ROWS / 2; i++){
-                                    int r = random.nextInt(max_firmness + 1);
-                                    if (!(r == max_firmness)) {
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                        blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2)+ btmBlock[r].getWidth() / 2,
-                                                stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
-                                                btmBlock[r], r + 1));
-                                    }
-                                }
-                            }
-                            if ((COLS % 2 == 1)&(ROWS % 2 == 1)) {
-                                int r = random.nextInt(max_firmness + 1);
-                                if (!(r == max_firmness))
-                                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * COLS / 2 + btmBlock[r].getWidth() / 2,
-                                            stepV + btmBlock[r].getHeight() * ROWS / 2 + btmBlock[r].getHeight() / 2,
-                                            btmBlock[r], r + 1));
-                            }
+                            blockGen();
                             ball.x = w / 4;
                             ball.y = 3 * h / 4;
                             ball.vx = w / 4;
                             if (y_speed == 1)
-                                ball.vy = - 2 * 1.3f * h / 9;
+                                ball.vy = -2 * 1.3f * h / 9;
                             if (y_speed == 3)
-                                ball.vy = - 2.7f * 1.3f * h / 9;
+                                ball.vy = -2.7f * 1.3f * h / 9;
                             if (y_speed == 2)
-                                ball.vy = - 2.5f * 1.3f * h / 9;
+                                ball.vy = -2.5f * 1.3f * h / 9;
                         }
                         lastTime = currentTime;
                         lastX = board.x;
+
+                        for (Iterator<Bomb> it = flyingBombs.iterator(); it.hasNext(); ) {
+                            Bomb bomb = it.next();
+                            if ((bomb.x < board.x) & (bomb.x + btmBomb.getWidth() / 2 > board.x - btmBoard.getWidth() / 2) &
+                                    (bomb.y > board.y - btmBoard.getHeight() / 2) & (bomb.y < board.y + btmBoard.getHeight() / 2)) {
+                                soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
+                                it.remove();
+                                gameOver();
+                            } else {
+                                if ((bomb.x > bomb.x) & (bomb.x - btmBomb.getWidth() / 2 < bomb.x + btmBoard.getWidth() / 2) &
+                                        (bomb.y > bomb.y - btmBoard.getHeight() / 2) & (bomb.y < bomb.y + btmBoard.getHeight() / 2)) {
+                                    soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
+                                    it.remove();
+                                    gameOver();
+                                } else {
+                                    if (bomb.x - btmBomb.getWidth() / 2 > board.x - btmBoard.getWidth() / 2 & bomb.x - btmBomb.getWidth() / 2 < board.x + btmBoard.getWidth() / 2 &
+                                            bomb.y + btmBomb.getHeight() / 2 > board.y - btmBoard.getHeight() / 2) {
+                                        soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
+                                        it.remove();
+                                        gameOver();
+                                    } else if (bomb.y - btmBomb.getHeight() / 2 >= h)
+                                        it.remove();
+
+                                }
+
+
+                            }
+
+
+                        }
+
                         if (ball.x + btmBall.getWidth() / 2 > w) {
                             ball.vx = -ball.vx;
                             ball.x = w - btmBall.getWidth() / 2;
@@ -283,21 +220,13 @@ public class MyThread extends Thread {
                             ball.x = btmBall.getWidth() / 2;
                             soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
-                        if ((ball.y + btmBall.getHeight() / 2 > board.y)|((System.currentTimeMillis() / 1000.0
-                                - start_time >= my_time)&(isTimeOn))) {
+                        if ((ball.y + btmBall.getHeight() / 2 > board.y) | ((System.currentTimeMillis() / 1000.0
+                                - start_time >= my_time) & (isTimeOn))) {
                             ball.vy = 0;
                             ball.vx = 0;
                             if (ball.y + btmBall.getHeight() / 2 > board.y)
                                 ball.y = board.y - btmBall.getHeight() / 2;
-                            soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
-                            if (score > MainActivity.prefs.getInt("key", 0)) {
-                                editor.putInt("key", score);
-                                editor.commit();
-                            }
-                            Intent intent = new Intent(context, MainActivity.class);
-                            intent.putExtra("SCORE", score);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            context.startActivity(intent);
+                            gameOver();
                             break;
                         }
                         if (ball.y - btmBall.getHeight() / 2 < 0) {
@@ -314,6 +243,8 @@ public class MyThread extends Thread {
                                 b.firmness--;
                                 if (b.firmness == 0) {
                                     score++;
+                                    if (b.hasBomb)
+                                        flyingBombs.add(new Bomb(b.x, b.y, y_speed * h / 6, btmBomb));
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
                                 } else {
@@ -329,6 +260,8 @@ public class MyThread extends Thread {
                                 b.firmness--;
                                 if (b.firmness == 0) {
                                     score++;
+                                    if (b.hasBomb)
+                                        flyingBombs.add(new Bomb(b.x, b.y, y_speed * h / 6, btmBomb));
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
                                 } else {
@@ -344,6 +277,8 @@ public class MyThread extends Thread {
                                 b.firmness--;
                                 if (b.firmness == 0) {
                                     score++;
+                                    if (b.hasBomb)
+                                        flyingBombs.add(new Bomb(b.x, b.y, y_speed * h / 6, btmBomb));
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
                                 } else {
@@ -359,6 +294,8 @@ public class MyThread extends Thread {
                                 b.firmness--;
                                 if (b.firmness == 0) {
                                     score++;
+                                    if (b.hasBomb)
+                                        flyingBombs.add(new Bomb(b.x, b.y, y_speed * h / 6, btmBomb));
                                     it.remove();
                                     soundPool.play(soundCrack, 1, 1, 1, 0, 1f);
                                 } else {
@@ -421,6 +358,92 @@ public class MyThread extends Thread {
 
     private void drawAll(Canvas canvas) {
 
+    }
+
+    private void blockGen() {
+        for (int i = 0; i < ROWS / 2; i++) {
+            for (int j = 0; j < COLS / 2; j++) {
+                int r = random.nextInt(max_firmness + 1);
+                if (!(r == max_firmness)) {
+                    int withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                    withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                    withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                    withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                }
+            }
+        }
+        if (ROWS % 2 == 1) {
+            for (int j = 0; j < COLS / 2; j++) {
+                int r = random.nextInt(max_firmness + 1);
+                if (!(r == max_firmness)) {
+                    int withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * j + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                    withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS - j - 1) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                }
+            }
+        }
+        if (COLS % 2 == 1) {
+            for (int i = 0; i < ROWS / 2; i++) {
+                int r = random.nextInt(max_firmness + 1);
+                if (!(r == max_firmness)) {
+                    int withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * i + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                    withBomb = random.nextInt(2);
+                    blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
+                            stepV + btmBlock[r].getHeight() * (ROWS - i - 1) + btmBlock[r].getHeight() / 2,
+                            btmBlock[r], r + 1));
+                    blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+                }
+            }
+        }
+        if ((COLS % 2 == 1) & (ROWS % 2 == 1)) {
+            int r = random.nextInt(max_firmness + 1);
+            if (!(r == max_firmness)) {
+                int withBomb = random.nextInt(2);
+                blocks.add(new Block(stepH + btmBlock[r].getWidth() * COLS / 2 + btmBlock[r].getWidth() / 2,
+                        stepV + btmBlock[r].getHeight() * ROWS / 2 + btmBlock[r].getHeight() / 2,
+                        btmBlock[r], r + 1));
+                blocks.get(blocks.size() - 1).hasBomb = (withBomb == 1);
+            }
+        }
+    }
+
+    private void gameOver() {
+        soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
+        if (score > MainActivity.prefs.getInt("key", 0)) {
+            editor.putInt("key", score);
+            editor.commit();
+        }
+        Intent intent = new Intent(context, MainActivity.class);
+        intent.putExtra("SCORE", score);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        context.startActivity(intent);
     }
 
 
