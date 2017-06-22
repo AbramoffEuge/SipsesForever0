@@ -43,9 +43,8 @@ public class MyThread extends Thread {
     private Board board;
     private Ball ball;
     private List<Block> blocks = new ArrayList<>();
-    private static int COLS = 4, ROWS = 4; // Строго контролировать!
-    int[][] field = new int[ROWS + 2][COLS + 2];
-    private float stepH, stepV; //Шаги между блоками
+    private static int COLS = 9, ROWS = 5; // Строго контролировать!
+    private int stepH, stepV; //Шаги между блоками
     private SoundPool soundPool;
     private int soundBounce,soundCrack,soundEnd;
     public SharedPreferences.Editor editor;
@@ -55,14 +54,6 @@ public class MyThread extends Thread {
     public String time;
     private double start_time;
     private Random random = new Random();
-
-    public static float getDeltaT() {
-        return deltaT;
-    }
-
-    public static void setDeltaT(float deltaT) {
-        MyThread.deltaT = deltaT;
-    }
 
     public MyThread(Context context, SurfaceHolder surfaceHolder, int w, int h) {
         this.context = context;
@@ -90,10 +81,21 @@ public class MyThread extends Thread {
         btmBoard = BitmapFactory.decodeResource(context.getResources(), R.mipmap.board0);
         board = new Board(w / 2, h - 50 - btmBoard.getHeight() / 2, btmBoard);
 
-        btmBlock = new Bitmap[]{BitmapFactory.decodeResource(context.getResources(), R.mipmap.block0),
-                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block1),
-                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block2),
-                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block3)};
+        btmBlock = new Bitmap[]{BitmapFactory.decodeResource(context.getResources(), R.mipmap.block0_m),
+                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block1_m),
+                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block2_m),
+                BitmapFactory.decodeResource(context.getResources(), R.mipmap.block3_m)};
+
+        btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_s);
+        ball = new Ball(w / 4, 3 * h / 4, btmBall);
+        ball.vx = w / 4;
+        if (y_speed == 1)
+            ball.vy = - 2 * 1.3f * h / 9;
+        if (y_speed == 3)
+            ball.vy = - 2.7f * 1.3f * h / 9;
+        if (y_speed == 2)
+            ball.vy = - 2.5f * 1.3f * h / 9;
+        board.vx = 0;
 
         /*stepH = (w - btmBlock[3].getWidth()*COLS)/(COLS + 1);
         stepV = (h / 2 - btmBlock[3].getHeight()*ROWS)/(ROWS + 1);
@@ -103,8 +105,14 @@ public class MyThread extends Thread {
                         stepV*(i + 1) + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
             }
         }*/
-        stepH = (w - COLS * btmBlock[3].getWidth()) / 2;
-        stepV = (h / 2 - ROWS * btmBlock[3].getHeight()) / 2;
+
+        stepH = 2 * btmBall.getWidth();
+        COLS = (w - 2 * stepH) / btmBlock[0].getWidth();
+        stepH = (w - COLS * btmBlock[0].getWidth()) / 2;
+        stepV = h / 10;
+        ROWS = (h / 2 - stepV)/ btmBlock[0].getHeight();
+        stepV = (h / 2 - ROWS * btmBlock[0].getHeight()) / 2;
+
         for (int i = 0; i < ROWS / 2; i++) {
             for (int j = 0; j < COLS / 2; j++) {
                 int r = random.nextInt(max_firmness + 1);
@@ -153,39 +161,18 @@ public class MyThread extends Thread {
         if ((COLS % 2 == 1)&(ROWS % 2 == 1)) {
             int r = random.nextInt(max_firmness + 1);
             if (!(r == max_firmness))
-                blocks.add(new Block(stepH + btmBlock[r].getWidth() * COLS / 2 + btmBlock[r].getWidth() / 2,
-                        stepV + btmBlock[r].getHeight() * ROWS / 2 + btmBlock[r].getHeight() / 2,
+                blocks.add(new Block(stepH + btmBlock[r].getWidth() * (COLS / 2) + btmBlock[r].getWidth() / 2,
+                        stepV + btmBlock[r].getHeight() * (ROWS / 2) + btmBlock[r].getHeight() / 2,
                         btmBlock[r], r + 1));
         }
-
-        btmBall = BitmapFactory.decodeResource(context.getResources(), R.mipmap.ball_m);
-        ball = new Ball(w / 4, 3 * h / 4, btmBall);
-        ball.vx = w / 4;
-        ball.vy = -y_speed * h / 6;
-        board.vx = 0;
 
         soundPool = new SoundPool(6, AudioManager.STREAM_MUSIC, 1);
         soundBounce = soundPool.load(context, R.raw.bounce, 2);
         soundCrack = soundPool.load(context, R.raw.crack, 2);
         soundEnd = soundPool.load(context, R.raw.end, 2);
 
-        for (int i = 1; i < ROWS + 1; i++) {
-            for (int j = 1; j < ROWS + 1; j++) {
-                field[i][j] = max_firmness;
-            }
-        }
-        for (int j = 0; j < COLS + 2; j++) {
-            field[0][j] = 0;
-            field[ROWS + 1][j] = 0;
-        }
-        for (int i = 0; i < ROWS + 2; i++) {
-            field[i][0] = 0;
-            field[i][COLS + 1] = 0;
-        }
         editor = MainActivity.prefs.edit();
         lastXX = 0;
-
-
     }
 
     public void setRunning(boolean running) {
@@ -213,7 +200,6 @@ public class MyThread extends Thread {
                             b.draw(canvas);
 
                         currentTime = System.currentTimeMillis() / 1000.0;
-                        //deltaT += (float) (currentTime - lastTime);
                         deltaT = (float) (currentTime - lastTime);
                         vxboard = (board.x - lastX) / deltaT;
 
@@ -278,7 +264,12 @@ public class MyThread extends Thread {
                             ball.x = w / 4;
                             ball.y = 3 * h / 4;
                             ball.vx = w / 4;
-                            ball.vy = -y_speed * h / 6;
+                            if (y_speed == 1)
+                                ball.vy = - 2 * 1.3f * h / 9;
+                            if (y_speed == 3)
+                                ball.vy = - 2.7f * 1.3f * h / 9;
+                            if (y_speed == 2)
+                                ball.vy = - 2.5f * 1.3f * h / 9;
                         }
                         lastTime = currentTime;
                         lastX = board.x;
