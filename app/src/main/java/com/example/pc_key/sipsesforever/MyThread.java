@@ -198,13 +198,13 @@ public class MyThread extends Thread {
                         for (Iterator<Bomb> it = flyingBombs.iterator(); it.hasNext(); ) {
                             Bomb bomb = it.next();
                             if ((bomb.x < board.x) & (bomb.x + btmBomb.getWidth() / 2 > board.x - btmBoard.getWidth() / 2) &
-                                    (bomb.y > board.y - btmBoard.getHeight() / 2) & (bomb.y < board.y + btmBoard.getHeight() / 2)) {
+                                    (bomb.y+ btmBomb.getHeight()/2 > board.y - btmBoard.getHeight() / 2)) {
                                 soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
                                 it.remove();
                                 gameOver();
                             } else {
-                                if ((bomb.x > bomb.x) & (bomb.x - btmBomb.getWidth() / 2 < bomb.x + btmBoard.getWidth() / 2) &
-                                        (bomb.y > bomb.y - btmBoard.getHeight() / 2) & (bomb.y < bomb.y + btmBoard.getHeight() / 2)) {
+                                if ((bomb.x > board.x) & (bomb.x - btmBomb.getWidth() / 2 < board.x + btmBoard.getWidth() / 2) &
+                                        (bomb.y+btmBomb.getHeight()/2 > board.y - btmBoard.getHeight() / 2)) {
                                     soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
                                     it.remove();
                                     gameOver();
