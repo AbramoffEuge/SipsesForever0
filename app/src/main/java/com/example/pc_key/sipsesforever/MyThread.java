@@ -6,21 +6,17 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.media.AudioManager;
 import android.media.SoundPool;
-import android.util.Log;
 import android.view.SurfaceHolder;
-import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by PC_key on 19.06.2017.
@@ -63,6 +59,22 @@ public class MyThread extends Thread {
         this.w = w;
         this.h = h;
         this.surfaceHolder = surfaceHolder;
+    }
+
+    public void setRunning(boolean running) {
+        this.running = running;
+    }
+
+    @Override
+    public void run() {
+        Canvas canvas;
+        double lastTime = System.currentTimeMillis() / 1000.0;
+        double currentTime;
+        score = 0;
+        paint.setColor(0xFFFA6C00);
+        paint_text.setColor(0xE7C44F06);
+        start_time = System.currentTimeMillis() / 1000.0;
+
 
         try {
             max_firmness = MainActivity.prefs1.getInt("firmness", 4);
@@ -74,7 +86,6 @@ public class MyThread extends Thread {
                 String[] words = time.split(":");
                 my_time = Integer.parseInt(words[0]) * 60 + Integer.parseInt(words[1]);
             }
-
         } catch (Exception e) {
         }
 
@@ -85,6 +96,7 @@ public class MyThread extends Thread {
 
         btmBoard = BitmapFactory.decodeResource(context.getResources(), R.mipmap.board0);
         board = new Board(w / 2, h - 50 - btmBoard.getHeight() / 2, btmBoard);
+        float lastX = board.x;
 
         btmBlock = new Bitmap[]{BitmapFactory.decodeResource(context.getResources(), R.mipmap.block0_m),
                 BitmapFactory.decodeResource(context.getResources(), R.mipmap.block1_m),
@@ -102,14 +114,6 @@ public class MyThread extends Thread {
             ball.vy = -2.5f * 1.3f * h / 9;
         board.vx = 0;
 
-        /*stepH = (w - btmBlock[3].getWidth()*COLS)/(COLS + 1);
-        stepV = (h / 2 - btmBlock[3].getHeight()*ROWS)/(ROWS + 1);
-        for (int i = 0; i < ROWS; i++){
-            for (int j = 0; j < COLS; j++){
-                blocks.add(new Block(stepH*(j + 1) + btmBlock[3].getWidth()*j + btmBlock[3].getWidth()/2,
-                        stepV*(i + 1) + btmBlock[3].getHeight()*i + btmBlock[3].getHeight()/2, btmBlock[3], 4));
-            }
-        }*/
 
         stepH = 2 * btmBall.getWidth();
         COLS = (w - 2 * stepH) / btmBlock[0].getWidth();
@@ -127,22 +131,8 @@ public class MyThread extends Thread {
 
         editor = MainActivity.prefs.edit();
         lastXX = 0;
-    }
 
-    public void setRunning(boolean running) {
-        this.running = running;
-    }
 
-    @Override
-    public void run() {
-        Canvas canvas;
-        double lastTime = System.currentTimeMillis() / 1000.0;
-        double currentTime;
-        float lastX = board.x;
-        score = 0;
-        paint.setColor(0xFFFA6C00);
-        paint_text.setColor(0xE7C44F06);
-        start_time = System.currentTimeMillis() / 1000.0;
         while (running) {
             canvas = surfaceHolder.lockCanvas();
             if (canvas != null)
@@ -163,8 +153,8 @@ public class MyThread extends Thread {
                         vxboard = (board.x - lastX) / deltaT;
 
                         if (isTimeOn) {
-                            int min = (int)((my_time - (currentTime - start_time)) / 60);
-                            int sec = (int)(my_time - (currentTime - start_time) - min * 60);
+                            int min = (int) ((my_time - (currentTime - start_time)) / 60);
+                            int sec = (int) (my_time - (currentTime - start_time) - min * 60);
                             text = "TIME : " + Integer.toString(min) + " : " + Integer.toString(sec);
                             canvas.drawText(text, 6.3f * w / 11, h / 25, paint_text);
                         }
@@ -198,13 +188,13 @@ public class MyThread extends Thread {
                         for (Iterator<Bomb> it = flyingBombs.iterator(); it.hasNext(); ) {
                             Bomb bomb = it.next();
                             if ((bomb.x < board.x) & (bomb.x + btmBomb.getWidth() / 2 > board.x - btmBoard.getWidth() / 2) &
-                                    (bomb.y+ btmBomb.getHeight()/2 > board.y - btmBoard.getHeight() / 2)) {
+                                    (bomb.y + btmBomb.getHeight() / 2 > board.y - btmBoard.getHeight() / 2)) {
                                 soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
                                 it.remove();
                                 gameOver();
                             } else {
                                 if ((bomb.x > board.x) & (bomb.x - btmBomb.getWidth() / 2 < board.x + btmBoard.getWidth() / 2) &
-                                        (bomb.y+btmBomb.getHeight()/2 > board.y - btmBoard.getHeight() / 2)) {
+                                        (bomb.y + btmBomb.getHeight() / 2 > board.y - btmBoard.getHeight() / 2)) {
                                     soundPool.play(soundEnd, 1, 1, 1, 0, 1f);
                                     it.remove();
                                     gameOver();
@@ -328,7 +318,7 @@ public class MyThread extends Thread {
                             //ball.vx = ball.vx * 0.7f + vxboard * 0.3f;
                             ball.vx = -1.5f * ball.vy * (ball.x - board.x) / (btmBoard.getWidth() / 2);
                             ball.y = board.y - btmBoard.getHeight() / 2 - btmBall.getHeight() / 2;
-                            soundPool.play(soundBounce, 1, 10, 10, 0, 1f);
+                            soundPool.play(soundBounce, 1, 1, 1, 0, 1f);
                         }
 
                         drawAll(canvas);

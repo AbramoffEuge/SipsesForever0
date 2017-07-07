@@ -1,6 +1,5 @@
 package com.example.pc_key.sipsesforever;
 
-import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -25,20 +24,21 @@ public class Main2Activity extends AppCompatActivity implements SensorEventListe
         getSupportActionBar().hide();
         mySurface = new MySurface(this);
         setContentView(mySurface);
-        sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        sensorManager.registerListener(this,accSensor,SensorManager.SENSOR_DELAY_GAME);
+        sensorManager.registerListener(this, accSensor, SensorManager.SENSOR_DELAY_GAME);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
         sensorManager.unregisterListener(this);
+        mySurface.getMyThread().setRunning(false);
     }
 
     @Override
@@ -46,8 +46,8 @@ public class Main2Activity extends AppCompatActivity implements SensorEventListe
         try {
             if (mySurface.getMyThread().isTiltOn)
                 mySurface.getMyThread().accelerometerChange(event.values[0]);
+        } catch (Exception e) {
         }
-        catch(Exception e){}
     }
 
     @Override
