@@ -4,15 +4,16 @@ package com.example.pc_key.sipsesforever;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
+
 import android.os.Bundle;
-import android.support.v7.widget.SwitchCompat;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.Switch;
 
 public class Main3Activity extends AppCompatActivity {
 
@@ -31,27 +32,28 @@ public class Main3Activity extends AppCompatActivity {
         //getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         getSupportActionBar().hide();
         setContentView(R.layout.activity_main3);
-        
-        spinner_firmness = (Spinner) findViewById(R.id.spinner1);
+
+        spinner_firmness =  findViewById(R.id.spinner1);
         spinner_firmness.setSelection(MainActivity.prefs1.getInt("firmness", 1) - 1);
-        
-        spinner_speed = (Spinner) findViewById(R.id.spinner2);
+
+        spinner_speed = findViewById(R.id.spinner2);
         spinner_speed.setSelection(MainActivity.prefs2.getInt("speed", 1) - 1);
 
-        
-        switch_time = (SwitchCompat) findViewById(R.id.switch1);
+
+        switch_time =  findViewById(R.id.switch1);
         switch_time.setChecked(MainActivity.prefs3.getBoolean("time_mode", false));
 
-        
-        switch_tilt = (SwitchCompat) findViewById(R.id.switch2);
+
+        switch_tilt =  findViewById(R.id.switch2);
         switch_tilt.setChecked(MainActivity.prefs4.getBoolean("tilt", false));
 
-        
-        editText_time = (EditText) findViewById(R.id.editText);
+
+        editText_time = findViewById(R.id.editText);
         editText_time.setText(MainActivity.prefs5.getString("time", ""));
     }
+
     public void onMyButtonClick3(View v) {
-        Intent intent1 = new Intent(Main3Activity.this, Main2Activity.class);
+       // Intent intent1 = new Intent(Main3Activity.this, Main2Activity.class);
 
         selected = spinner_firmness.getSelectedItem().toString();
         editor = MainActivity.prefs1.edit();
@@ -80,7 +82,7 @@ public class Main3Activity extends AppCompatActivity {
         editor.putString("time", selected);
         editor.commit();
 
-        if (!((switch_time.isChecked())&&(selected == ""))) {
+        if (!((switch_time.isChecked()) && (selected == ""))) {
             Intent intent = new Intent(Main3Activity.this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);

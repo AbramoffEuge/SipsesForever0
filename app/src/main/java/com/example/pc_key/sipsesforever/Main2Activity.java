@@ -4,7 +4,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
@@ -39,6 +39,7 @@ public class Main2Activity extends AppCompatActivity implements SensorEventListe
         super.onPause();
         sensorManager.unregisterListener(this);
         mySurface.getMyThread().setRunning(false);
+        mySurface.getMyThread().interrupt();
     }
 
     @Override

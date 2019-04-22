@@ -449,6 +449,7 @@ public class MyThread extends Thread {
         intent.putExtra("SCORE", score);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         context.startActivity(intent);
+        interrupt();
     }
 
 

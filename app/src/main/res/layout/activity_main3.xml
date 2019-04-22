@@ -154,7 +154,7 @@
         android:layout_toLeftOf="@+id/switch1"
         android:layout_toStartOf="@+id/switch1" />
 
-    <android.support.v7.widget.SwitchCompat
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch1"
         android:layout_width="50dp"
         android:layout_height="wrap_content"
@@ -189,7 +189,7 @@
         android:layout_marginBottom="14dp"
         android:background="?android:attr/colorActivatedHighlight" />
 
-    <android.support.v7.widget.SwitchCompat
+    <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/switch2"
         android:layout_width="50dp"
         android:layout_height="40dp"
