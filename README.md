@@ -2,10 +2,10 @@
 > Командный проект в рамках летней школьной практики в компании JetBrains
 
 ### Команда:
-- Абрамов Евгений ([@evgenabramov](https://github.com/evgenabramov))
-- Ланько Вадим ([@buzka16](https://github.com/buzka16))
-- Тагиев Андрей 
-- Петров Сергей
+- Евгений Абрамов ([@evgenabramov](https://github.com/evgenabramov))
+- Вадим Ланько ([@buzka16](https://github.com/buzka16))
+- Андрей Тагиев 
+- Сергей Петров
 
 ### Описание:
 На экране игры имеются:
