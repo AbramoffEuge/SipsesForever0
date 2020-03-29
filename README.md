@@ -25,7 +25,6 @@
 [Презентация проекта](BricksBreaker.pdf)
 
 ### Некоторые скриншоты игры:
-
-<img src="images/screenshot1.png" alt="drawing" width="200"/>
-<img src="images/screenshot2.png" alt="drawing" width="200"/>
-<img src="images/screenshot3.png" alt="drawing" width="200"/>
+Стартовый экран             |  Экран настроек         | Игровое поле 
+:-------------------------:|:-------------------------:|:-----------------:
+<img src="images/screenshot1.png" alt="drawing" width="200"/> | <img src="images/screenshot2.png" alt="drawing" width="200"/> | <img src="images/screenshot3.png" alt="drawing" width="200"/>
